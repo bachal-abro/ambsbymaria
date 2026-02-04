@@ -55,7 +55,7 @@ export default function Header() {
                 </span>
               </div>
               <span className="text-xl font-display tracking-wider text-gradient glow-text hidden sm:block">
-                LUXE
+                AmbsbyMaria
               </span>
             </Link>
 

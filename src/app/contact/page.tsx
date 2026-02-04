@@ -211,10 +211,10 @@ export default function ContactPage() {
                       Email
                     </p>
                     <a
-                      href="mailto:concierge@luxejewelry.com"
+                      href="mailto:info@ambsbymaria.com"
                       className="text-luxury-white hover:text-luxury-gold transition-colors"
                     >
-                      concierge@luxejewelry.com
+                      info@ambsbymaria.com
                     </a>
                   </div>
                 </div>

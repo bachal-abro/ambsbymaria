@@ -45,7 +45,7 @@ export default function Footer() {
                   </span>
                 </div>
                 <span className="text-2xl font-display tracking-wider text-gradient">
-                  LUXE
+                  AmbsbyMaria
                 </span>
               </div>
             </Link>
@@ -133,7 +133,7 @@ export default function Footer() {
         {/* Bottom */}
         <div className="mt-16 pt-8 border-t border-luxury-charcoal-light flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-luxury-white/40 text-sm">
-            &copy; {new Date().getFullYear()} Luxe Jewelry Boutique. All rights
+            &copy; {new Date().getFullYear()} AmbsbyMaria. All rights
             reserved.
           </p>
           <div className="flex space-x-6 text-sm">

@@ -26,8 +26,8 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'Luxe Jewelry Boutique | Premium Handcrafted Jewelry',
-  description: 'Discover exquisite handcrafted jewelry. Luxury rings, necklaces, bracelets, and earrings crafted with the finest materials.',
+  title: 'AmbsbyMaria | Premium Handcrafted Jewelry',
+  description: 'Discover exquisite handcrafted jewelry by Maria. Luxury rings, necklaces, bracelets, and earrings crafted with the finest materials.',
   keywords: 'luxury jewelry, diamond rings, gold necklaces, premium jewelry, handcrafted jewelry',
 }
 

@@ -1,0 +1,10 @@
+# AmbsbyMaria - Robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /cart
+Disallow: /checkout
+
+# Sitemap
+Sitemap: https://ambsbymaria.vercel.app/sitemap.xml
