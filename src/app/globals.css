@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+
+@layer base {
+  * {
+    @apply border-luxury-charcoal;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-luxury-black text-luxury-white font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .luxury-container {
+    @apply max-w-7xl mx-auto px-6 lg:px-8;
+  }
+
+  .luxury-btn {
+    @apply relative inline-flex items-center justify-center px-8 py-4 
+           font-sans text-sm uppercase tracking-wider
+           bg-transparent border border-luxury-gold text-luxury-gold
+           transition-all duration-500 ease-out
+           overflow-hidden;
+  }
+
+  .luxury-btn::before {
+    content: '';
+    @apply absolute inset-0 bg-luxury-gold 
+           transform -translate-x-full transition-transform duration-500;
+  }
+
+  .luxury-btn:hover::before {
+    @apply translate-x-0;
+  }
+
+  .luxury-btn span {
+    @apply relative z-10 transition-colors duration-500;
+  }
+
+  .luxury-btn:hover span {
+    @apply text-luxury-black;
+  }
+
+  .luxury-btn-primary {
+    @apply luxury-btn bg-luxury-gold text-luxury-black border-luxury-gold;
+  }
+
+  .luxury-btn-primary::before {
+    @apply bg-luxury-gold-dark;
+  }
+
+  .luxury-card {
+    @apply bg-luxury-charcoal border border-luxury-charcoal-light
+           transition-all duration-500
+           hover:border-luxury-gold hover:shadow-luxury-glow;
+  }
+
+  .luxury-input {
+    @apply w-full px-4 py-3 
+           bg-luxury-charcoal border border-luxury-charcoal-light
+           text-luxury-white placeholder-luxury-white/40
+           focus:outline-none focus:border-luxury-gold
+           transition-all duration-300;
+  }
+
+  .shimmer-effect {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer-effect::after {
+    content: '';
+    @apply absolute inset-0 
+           bg-gradient-to-r from-transparent via-luxury-gold/20 to-transparent
+           animate-shimmer;
+    background-size: 200% 100%;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-luxury-gradient;
+  }
+
+  .glow-text {
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  }
+
+  .luxury-divider {
+    @apply w-full h-px bg-gradient-to-r from-transparent via-luxury-gold to-transparent;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4af37;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e5c158;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(212, 175, 55, 0.3);
+  color: #fafafa;
+}
+
+/* Loading animation */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  animation: rotate 1s linear infinite;
+}

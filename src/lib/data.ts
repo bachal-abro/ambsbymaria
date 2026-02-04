@@ -1,0 +1,181 @@
+import type { Product, Material } from '@/types'
+
+export const materials: Material[] = [
+  {
+    id: 'yellow-gold',
+    name: '18K Yellow Gold',
+    color: '#D4AF37',
+    metallic: 1,
+    roughness: 0.2,
+    price: 0,
+  },
+  {
+    id: 'white-gold',
+    name: '18K White Gold',
+    color: '#E8E8E8',
+    metallic: 1,
+    roughness: 0.15,
+    price: 150,
+  },
+  {
+    id: 'rose-gold',
+    name: '18K Rose Gold',
+    color: '#B76E79',
+    metallic: 1,
+    roughness: 0.2,
+    price: 200,
+  },
+  {
+    id: 'platinum',
+    name: 'Platinum',
+    color: '#E5E4E2',
+    metallic: 1,
+    roughness: 0.1,
+    price: 500,
+  },
+]
+
+export const products: Product[] = [
+  {
+    id: '1',
+    name: 'Éternité Diamond Ring',
+    slug: 'eternite-diamond-ring',
+    description:
+      'A timeless symbol of eternal love, featuring a brilliant-cut diamond set in lustrous gold. Handcrafted with precision to capture light from every angle.',
+    price: 8500,
+    category: 'rings',
+    materials: materials,
+    defaultMaterial: 'yellow-gold',
+    images: [
+      'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800',
+      'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800',
+    ],
+    inStock: true,
+    featured: true,
+    specifications: {
+      weight: '4.2g',
+      dimensions: 'Size 7 (customizable)',
+      gemstone: 'Diamond',
+      carats: '1.5ct',
+      purity: '18K',
+    },
+  },
+  {
+    id: '2',
+    name: 'Céleste Necklace',
+    slug: 'celeste-necklace',
+    description:
+      'An exquisite statement piece inspired by celestial beauty. Delicate chain adorned with diamond accents that shimmer like stars.',
+    price: 12500,
+    category: 'necklaces',
+    materials: materials,
+    defaultMaterial: 'yellow-gold',
+    images: [
+      'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800',
+      'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800',
+    ],
+    inStock: true,
+    featured: true,
+    specifications: {
+      weight: '12.8g',
+      dimensions: '18 inches',
+      gemstone: 'Diamond',
+      carats: '2.5ct total',
+      purity: '18K',
+    },
+  },
+  {
+    id: '3',
+    name: 'Royale Tennis Bracelet',
+    slug: 'royale-tennis-bracelet',
+    description:
+      'A classic tennis bracelet reimagined with modern elegance. Featuring perfectly matched diamonds in a continuous line of brilliance.',
+    price: 15200,
+    category: 'bracelets',
+    materials: materials,
+    defaultMaterial: 'white-gold',
+    images: [
+      'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800',
+      'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800',
+    ],
+    inStock: true,
+    featured: true,
+    specifications: {
+      weight: '18.5g',
+      dimensions: '7 inches',
+      gemstone: 'Diamond',
+      carats: '5ct total',
+      purity: '18K',
+    },
+  },
+  {
+    id: '4',
+    name: 'Aurora Drop Earrings',
+    slug: 'aurora-drop-earrings',
+    description:
+      'Elegant drop earrings that cascade with grace. Each piece captures and reflects light with mesmerizing brilliance.',
+    price: 6800,
+    category: 'earrings',
+    materials: materials,
+    defaultMaterial: 'rose-gold',
+    images: [
+      'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800',
+      'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800',
+    ],
+    inStock: true,
+    featured: true,
+    specifications: {
+      weight: '6.4g',
+      dimensions: '1.5 inches drop',
+      gemstone: 'Diamond',
+      carats: '1.2ct total',
+      purity: '18K',
+    },
+  },
+  {
+    id: '5',
+    name: 'Lumière Solitaire Ring',
+    slug: 'lumiere-solitaire-ring',
+    description:
+      'The epitome of classic elegance. A stunning solitaire diamond that commands attention with its exceptional clarity and cut.',
+    price: 18900,
+    category: 'rings',
+    materials: materials,
+    defaultMaterial: 'platinum',
+    images: [
+      'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=800',
+      'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=800',
+    ],
+    inStock: true,
+    featured: false,
+    specifications: {
+      weight: '5.1g',
+      dimensions: 'Size 6 (customizable)',
+      gemstone: 'Diamond',
+      carats: '2.5ct',
+      purity: 'Platinum 950',
+    },
+  },
+  {
+    id: '6',
+    name: 'Versailles Chain Necklace',
+    slug: 'versailles-chain-necklace',
+    description:
+      'Inspired by French royalty, this substantial chain necklace exudes power and sophistication. Perfect for making a bold statement.',
+    price: 9200,
+    category: 'necklaces',
+    materials: materials,
+    defaultMaterial: 'yellow-gold',
+    images: [
+      'https://images.unsplash.com/photo-1611955167811-4711904bb9f8?w=800',
+      'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=800',
+    ],
+    inStock: true,
+    featured: false,
+    specifications: {
+      weight: '24.3g',
+      dimensions: '20 inches',
+      purity: '18K',
+    },
+  },
+]
