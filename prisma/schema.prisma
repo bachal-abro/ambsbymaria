@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  sku            String          @unique
+  name           String
+  slug           String          @unique
+  description    String
+  price          Float
+  category       String
+  images         String          // JSON array stored as string
+  inStock        Boolean         @default(true)
+  featured       Boolean         @default(false)
+  specifications String          // JSON object stored as string
+  defaultMaterial String         @default("")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  materials      ProductMaterial[]
+  orderItems     OrderItem[]
+}
+
+model Material {
+  id        String            @id @default(cuid())
+  slug      String            @unique
+  name      String
+  color     String
+  metallic  Float
+  roughness Float
+  price     Float
+  products  ProductMaterial[]
+  orderItems OrderItem[]
+}
+
+model ProductMaterial {
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String
+  material   Material @relation(fields: [materialId], references: [id])
+  materialId String
+
+  @@id([productId, materialId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  status          String      @default("pending") // pending, processing, shipped, delivered
+  customerName    String
+  email           String
+  phone           String      @default("")
+  address         String
+  city            String
+  postalCode      String
+  country         String      @default("Pakistan")
+  stripeSessionId String      @unique
+  total           Float
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    String
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String
+  material   Material @relation(fields: [materialId], references: [id])
+  materialId String
+  quantity   Int
+  unitPrice  Float
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String   @default("")
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

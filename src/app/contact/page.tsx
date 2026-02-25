@@ -39,12 +39,20 @@ export default function ContactPage() {
     e.preventDefault()
     setStatus('loading')
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      if (!res.ok) throw new Error('Failed to send')
       setStatus('success')
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
-      setTimeout(() => setStatus('idle'), 3000)
-    }, 1500)
+      setTimeout(() => setStatus('idle'), 4000)
+    } catch {
+      setStatus('idle')
+      alert('Failed to send message. Please try again.')
+    }
   }
 
   const handleChange = (
@@ -172,8 +180,8 @@ export default function ContactPage() {
                   {status === 'loading'
                     ? 'Sending...'
                     : status === 'success'
-                    ? 'Message Sent!'
-                    : 'Send Message'}
+                      ? 'Message Sent!'
+                      : 'Send Message'}
                 </span>
               </button>
 

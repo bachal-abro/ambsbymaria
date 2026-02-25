@@ -10,7 +10,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment
+# Environment — secrets never committed
 .env
 .env.local
 .env.development.local
@@ -36,3 +36,16 @@ coverage
 *.pem
 .vercel
 .turbo
+
+# Database files — never commit local SQLite DBs
+*.db
+*.sqlite
+prisma/dev.db
+
+# Temp build outputs
+tsc_out.txt
+build_out.txt
+seed_out.txt
+tsconfig.tsbuildinfo
+
+/src/generated/prisma

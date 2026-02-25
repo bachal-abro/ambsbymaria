@@ -15,14 +15,32 @@ const Hero3DScene = dynamic(() => import('@/components/3d/Hero3DScene'), {
   ),
 })
 
+interface Particle {
+  left: string
+  top: string
+  duration: number
+  delay: number
+}
+
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [particles, setParticles] = useState<Particle[]>([])
   const { scrollY } = useScroll()
   const opacity = useTransform(scrollY, [0, 500], [1, 0])
   const scale = useTransform(scrollY, [0, 500], [1, 0.8])
 
   useEffect(() => {
+    // Generate random positions client-side only to avoid SSR hydration mismatch
+    setParticles(
+      Array.from({ length: 25 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        duration: 3 + Math.random() * 2,
+        delay: Math.random() * 2,
+      }))
+    )
+
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth - 0.5) * 20,
@@ -65,25 +83,15 @@ export default function Hero() {
       }}
     >
 
-      {/* Animated shimmer particles */}
+      {/* Animated shimmer particles — client-side only to avoid hydration mismatch */}
       <div className="absolute inset-0">
-        {Array.from({ length: 25 }).map((_, i) => (
+        {particles.map((p, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-white rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              opacity: [0.15, 0.6, 0.15],
-              scale: [1, 1.8, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
+            style={{ left: p.left, top: p.top }}
+            animate={{ opacity: [0.15, 0.6, 0.15], scale: [1, 1.8, 1] }}
+            transition={{ duration: p.duration, repeat: Infinity, delay: p.delay }}
           />
         ))}
       </div>
@@ -91,7 +99,7 @@ export default function Hero() {
       {/* 3D Model - Cinematic Diamond Ring */}
       <motion.div
         className="absolute inset-0"
-        style={{ 
+        style={{
           opacity,
           scale,
         }}
