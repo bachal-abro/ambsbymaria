@@ -279,17 +279,17 @@ export default function AdminPage() {
                 {/* Tabs */}
                 <div className="flex gap-4 mb-8 border-b border-luxury-charcoal-light">
                     {([
-                        { key: 'products', label: `Products (${products.length})` },
-                        { key: 'orders', label: `Orders (${orders.length})` },
-                        { key: 'messages', label: `Messages (${messages.length})`, badge: unread },
-                    ] as const).map(({ key, label, badge }) => (
+                        { key: 'products' as Tab, label: `Products (${products.length})`, badge: 0 },
+                        { key: 'orders' as Tab, label: `Orders (${orders.length})`, badge: 0 },
+                        { key: 'messages' as Tab, label: `Messages (${messages.length})`, badge: unread },
+                    ]).map(({ key, label, badge }) => (
                         <button
                             key={key}
-                            onClick={() => setTab(key as Tab)}
+                            onClick={() => setTab(key)}
                             className={`pb-3 px-1 text-sm uppercase tracking-wider transition-colors flex items-center gap-2 ${tab === key ? 'text-luxury-gold border-b-2 border-luxury-gold' : 'text-luxury-white/50 hover:text-luxury-white'}`}
                         >
                             {label}
-                            {badge ? <span className="w-5 h-5 bg-luxury-gold text-white text-xs rounded-full flex items-center justify-center">{badge}</span> : null}
+                            {badge > 0 ? <span className="w-5 h-5 bg-luxury-gold text-white text-xs rounded-full flex items-center justify-center">{badge}</span> : null}
                         </button>
                     ))}
                 </div>
