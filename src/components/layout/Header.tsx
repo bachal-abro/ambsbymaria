@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag, Menu, X, Search } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useUIStore } from '@/store/uiStore'
-import { cn } from '@/lib/utils'
 
 const navigation = [
   { name: 'Collections', href: '/shop' },
@@ -19,18 +18,8 @@ const navigation = [
 ]
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false)
   const { isMenuOpen, toggleMenu, toggleCart } = useUIStore()
   const itemCount = useCartStore((state) => state.getItemCount())
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   return (
     <>
@@ -38,25 +27,20 @@ export default function Header() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-          scrolled
-            ? 'bg-luxury-black/95 backdrop-blur-md border-b border-luxury-charcoal-light'
-            : 'bg-transparent'
-        )}
+        className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-luxury-charcoal-light shadow-sm"
       >
         <div className="luxury-container">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 border border-luxury-gold flex items-center justify-center transition-all duration-300 group-hover:bg-luxury-gold">
-                <span className="text-luxury-gold text-xl font-display font-bold group-hover:text-luxury-black transition-colors">
-                  L
-                </span>
-              </div>
-              <span className="text-xl font-display tracking-wider text-gradient glow-text hidden sm:block">
-                AmbsbyMaria
-              </span>
+            <Link href="/" className="flex items-center group">
+              <Image
+                src="/logo.png"
+                alt="Ambs by Maria"
+                width={160}
+                height={56}
+                className="h-14 w-auto object-contain"
+                priority
+              />
             </Link>
 
             {/* Desktop Navigation */}
@@ -65,7 +49,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-sm uppercase tracking-wider text-luxury-white/80 hover:text-luxury-gold transition-colors duration-300 relative group"
+                  className="text-sm uppercase tracking-wider text-luxury-white/70 hover:text-luxury-gold transition-colors duration-300 relative group"
                 >
                   {item.name}
                   <span className="absolute -bottom-1 left-0 w-0 h-px bg-luxury-gold transition-all duration-300 group-hover:w-full" />
@@ -76,7 +60,7 @@ export default function Header() {
             {/* Icons */}
             <div className="flex items-center space-x-6">
               <button
-                className="text-luxury-white/80 hover:text-luxury-gold transition-colors duration-300"
+                className="text-luxury-white/70 hover:text-luxury-gold transition-colors duration-300"
                 aria-label="Search"
               >
                 <Search size={20} />
@@ -84,7 +68,7 @@ export default function Header() {
 
               <button
                 onClick={toggleCart}
-                className="relative text-luxury-white/80 hover:text-luxury-gold transition-colors duration-300"
+                className="relative text-luxury-white/70 hover:text-luxury-gold transition-colors duration-300"
                 aria-label="Shopping cart"
               >
                 <ShoppingBag size={20} />
@@ -92,7 +76,7 @@ export default function Header() {
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-2 -right-2 w-5 h-5 bg-luxury-gold text-luxury-black text-xs flex items-center justify-center rounded-full font-medium"
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-luxury-gold text-white text-xs flex items-center justify-center rounded-full font-medium"
                   >
                     {itemCount}
                   </motion.span>
@@ -101,7 +85,7 @@ export default function Header() {
 
               <button
                 onClick={toggleMenu}
-                className="lg:hidden text-luxury-white/80 hover:text-luxury-gold transition-colors duration-300"
+                className="lg:hidden text-luxury-white/70 hover:text-luxury-gold transition-colors duration-300"
                 aria-label="Menu"
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -121,7 +105,7 @@ export default function Header() {
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="fixed inset-0 z-40 lg:hidden"
           >
-            <div className="absolute inset-0 bg-luxury-black/95 backdrop-blur-lg">
+            <div className="absolute inset-0 bg-white/95 backdrop-blur-lg">
               <nav className="flex flex-col items-center justify-center h-full space-y-8">
                 {navigation.map((item, index) => (
                   <motion.div

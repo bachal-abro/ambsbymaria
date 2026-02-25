@@ -53,7 +53,7 @@ export default function AboutPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-luxury-black/70" />
+          <div className="absolute inset-0 bg-black/50" />
         </div>
 
         <motion.div
@@ -64,7 +64,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="font-display text-display-lg md:text-display-xl text-gradient mb-6"
+            className="font-display text-display-lg md:text-display-xl text-white mb-6"
           >
             Our Story
           </motion.h1>
@@ -72,7 +72,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="text-xl md:text-2xl text-luxury-champagne/80 max-w-3xl mx-auto"
+            className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto"
           >
             A legacy of passion, precision, and timeless beauty spanning nearly
             a century

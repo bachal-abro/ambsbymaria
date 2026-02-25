@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Instagram, Facebook, Twitter } from 'lucide-react'
 
 const footerLinks = {
@@ -32,22 +33,19 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-luxury-black border-t border-luxury-charcoal-light">
+    <footer className="bg-luxury-charcoal border-t border-luxury-charcoal-light">
       <div className="luxury-container py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-6">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 border border-luxury-gold flex items-center justify-center">
-                  <span className="text-luxury-gold text-2xl font-display font-bold">
-                    L
-                  </span>
-                </div>
-                <span className="text-2xl font-display tracking-wider text-gradient">
-                  AmbsbyMaria
-                </span>
-              </div>
+              <Image
+                src="/logo.png"
+                alt="Ambs by Maria"
+                width={180}
+                height={64}
+                className="h-16 w-auto object-contain"
+              />
             </Link>
             <p className="text-luxury-white/60 mb-6 max-w-sm leading-relaxed">
               Crafting timeless elegance since 1925. Each piece tells a story of
@@ -132,20 +130,20 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="mt-16 pt-8 border-t border-luxury-charcoal-light flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <p className="text-luxury-white/40 text-sm">
+          <p className="text-luxury-white/60 text-sm">
             &copy; {new Date().getFullYear()} AmbsbyMaria. All rights
             reserved.
           </p>
           <div className="flex space-x-6 text-sm">
             <Link
               href="/privacy"
-              className="text-luxury-white/40 hover:text-luxury-gold transition-colors duration-300"
+              className="text-luxury-white/60 hover:text-luxury-gold transition-colors duration-300"
             >
               Privacy Policy
             </Link>
             <Link
               href="/terms"
-              className="text-luxury-white/40 hover:text-luxury-gold transition-colors duration-300"
+              className="text-luxury-white/60 hover:text-luxury-gold transition-colors duration-300"
             >
               Terms of Service
             </Link>

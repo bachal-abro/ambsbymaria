@@ -121,7 +121,7 @@ export default function BrandStory() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
               {/* Glow overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </div>
 
             {/* Floating accent */}

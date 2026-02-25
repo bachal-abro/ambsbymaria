@@ -86,11 +86,11 @@ export default function FeaturedCollections() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
                   {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-luxury-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
                       whileHover={{ opacity: 1, scale: 1 }}
-                      className="text-luxury-gold flex items-center gap-2"
+                      className="text-white flex items-center gap-2"
                     >
                       <span className="text-sm uppercase tracking-wider">
                         View Details
@@ -117,7 +117,7 @@ export default function FeaturedCollections() {
                     <span className="text-luxury-gold font-medium text-lg">
                       {formatPrice(product.price)}
                     </span>
-                    <span className="text-luxury-white/40 text-xs">
+                    <span className="text-luxury-white/60 text-xs">
                       {product.specifications.carats}
                     </span>
                   </div>

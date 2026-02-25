@@ -55,11 +55,11 @@
   }
 
   .luxury-btn:hover span {
-    @apply text-luxury-black;
+    @apply text-white;
   }
 
   .luxury-btn-primary {
-    @apply luxury-btn bg-luxury-gold text-luxury-black border-luxury-gold;
+    @apply luxury-btn bg-luxury-gold text-white border-luxury-gold;
   }
 
   .luxury-btn-primary::before {
@@ -67,14 +67,14 @@
   }
 
   .luxury-card {
-    @apply bg-luxury-charcoal border border-luxury-charcoal-light
-           transition-all duration-500
+    @apply bg-white border border-luxury-charcoal-light
+           transition-all duration-500 shadow-sm
            hover:border-luxury-gold hover:shadow-luxury-glow;
   }
 
   .luxury-input {
-    @apply w-full px-4 py-3 
-           bg-luxury-charcoal border border-luxury-charcoal-light
+    @apply w-full px-4 py-3
+           bg-white border border-luxury-charcoal-light
            text-luxury-white placeholder-luxury-white/40
            focus:outline-none focus:border-luxury-gold
            transition-all duration-300;
@@ -99,7 +99,7 @@
   }
 
   .glow-text {
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    text-shadow: 0 0 20px rgba(212, 137, 158, 0.5);
   }
 
   .luxury-divider {
@@ -114,22 +114,22 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: #FFF5F7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4af37;
+  background: #D4899E;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #e5c158;
+  background: #EABED0;
 }
 
 /* Selection */
 ::selection {
-  background-color: rgba(212, 175, 55, 0.3);
-  color: #fafafa;
+  background-color: rgba(212, 137, 158, 0.25);
+  color: #1A1118;
 }
 
 /* Loading animation */

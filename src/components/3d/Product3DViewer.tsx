@@ -252,7 +252,7 @@ export default function Product3DViewer({
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
           transition={{ delay: 1, duration: 0.5 }}
-          className="absolute inset-0 flex items-center justify-center bg-luxury-charcoal z-10"
+          className="absolute inset-0 flex items-center justify-center bg-white z-10"
         >
           <div className="loading-spinner w-12 h-12 border-2 border-luxury-gold border-t-transparent rounded-full" />
         </motion.div>
@@ -284,7 +284,7 @@ export default function Product3DViewer({
             shadow-mapSize-height={2048}
           />
           <pointLight position={[-5, -5, -5]} intensity={0.5} />
-          <pointLight position={[0, 0, 5]} intensity={0.3} color="#D4AF37" />
+          <pointLight position={[0, 0, 5]} intensity={0.3} color="#D4899E" />
 
           {/* Environment */}
           <Environment

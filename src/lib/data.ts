@@ -7,7 +7,7 @@ export const materials: Material[] = [
     color: '#D4AF37',
     metallic: 1,
     roughness: 0.2,
-    price: 0,
+    price: 150,
   },
   {
     id: 'white-gold',
@@ -23,7 +23,7 @@ export const materials: Material[] = [
     color: '#B76E79',
     metallic: 1,
     roughness: 0.2,
-    price: 200,
+    price: 0,
   },
   {
     id: 'platinum',
@@ -38,6 +38,7 @@ export const materials: Material[] = [
 export const products: Product[] = [
   {
     id: '1',
+    sku: 'AM-RNG-001-48520',
     name: 'Éternité Diamond Ring',
     slug: 'eternite-diamond-ring',
     description:
@@ -45,7 +46,7 @@ export const products: Product[] = [
     price: 8500,
     category: 'rings',
     materials: materials,
-    defaultMaterial: 'yellow-gold',
+    defaultMaterial: 'rose-gold',
     images: [
       'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800',
       'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800',
@@ -62,6 +63,7 @@ export const products: Product[] = [
   },
   {
     id: '2',
+    sku: 'AM-NCK-002-73915',
     name: 'Céleste Necklace',
     slug: 'celeste-necklace',
     description:
@@ -69,7 +71,7 @@ export const products: Product[] = [
     price: 12500,
     category: 'necklaces',
     materials: materials,
-    defaultMaterial: 'yellow-gold',
+    defaultMaterial: 'rose-gold',
     images: [
       'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800',
       'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800',
@@ -86,6 +88,7 @@ export const products: Product[] = [
   },
   {
     id: '3',
+    sku: 'AM-BRC-003-62147',
     name: 'Royale Tennis Bracelet',
     slug: 'royale-tennis-bracelet',
     description:
@@ -110,6 +113,7 @@ export const products: Product[] = [
   },
   {
     id: '4',
+    sku: 'AM-ERR-004-31089',
     name: 'Aurora Drop Earrings',
     slug: 'aurora-drop-earrings',
     description:
@@ -134,6 +138,7 @@ export const products: Product[] = [
   },
   {
     id: '5',
+    sku: 'AM-RNG-005-95403',
     name: 'Lumière Solitaire Ring',
     slug: 'lumiere-solitaire-ring',
     description:
@@ -158,6 +163,7 @@ export const products: Product[] = [
   },
   {
     id: '6',
+    sku: 'AM-NCK-006-28764',
     name: 'Versailles Chain Necklace',
     slug: 'versailles-chain-necklace',
     description:
@@ -165,7 +171,7 @@ export const products: Product[] = [
     price: 9200,
     category: 'necklaces',
     materials: materials,
-    defaultMaterial: 'yellow-gold',
+    defaultMaterial: 'rose-gold',
     images: [
       'https://images.unsplash.com/photo-1611955167811-4711904bb9f8?w=800',
       'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=800',

@@ -10,16 +10,16 @@ const config: Config = {
     extend: {
       colors: {
         luxury: {
-          black: '#0A0A0A',
-          charcoal: '#1A1A1A',
-          'charcoal-light': '#2A2A2A',
-          gold: '#D4AF37',
-          'gold-light': '#E5C158',
-          'gold-dark': '#B8941F',
-          champagne: '#F7E7CE',
+          black: '#FFFBFC',
+          charcoal: '#FFF5F7',
+          'charcoal-light': '#EDE4E7',
+          gold: '#D4899E',
+          'gold-light': '#EABED0',
+          'gold-dark': '#B86B80',
+          champagne: '#FDF2F4',
           silver: '#C0C0C0',
           'rose-gold': '#B76E79',
-          white: '#FAFAFA',
+          white: '#1A1118',
         },
       },
       fontFamily: {
@@ -34,14 +34,14 @@ const config: Config = {
         'display-sm': ['2.5rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
       },
       boxShadow: {
-        'luxury-glow': '0 0 40px rgba(212, 175, 55, 0.15)',
-        'luxury-glow-lg': '0 0 60px rgba(212, 175, 55, 0.25)',
-        'luxury-elevation': '0 20px 60px rgba(0, 0, 0, 0.5)',
+        'luxury-glow': '0 0 40px rgba(212, 137, 158, 0.15)',
+        'luxury-glow-lg': '0 0 60px rgba(212, 137, 158, 0.25)',
+        'luxury-elevation': '0 20px 60px rgba(0, 0, 0, 0.1)',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'luxury-gradient': 'linear-gradient(135deg, #D4AF37 0%, #E5C158 50%, #B8941F 100%)',
-        'dark-gradient': 'linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%)',
+        'luxury-gradient': 'linear-gradient(135deg, #D4899E 0%, #EABED0 50%, #B86B80 100%)',
+        'dark-gradient': 'linear-gradient(180deg, #FFFBFC 0%, #FFF5F7 100%)',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

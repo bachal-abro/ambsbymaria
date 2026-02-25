@@ -2,133 +2,108 @@
 
 import { useRef, Suspense, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { 
-  OrbitControls, 
-  Environment, 
+import {
+  OrbitControls,
+  Environment,
   ContactShadows,
   PerspectiveCamera,
-  SpotLight,
   Float,
-  MeshTransmissionMaterial,
   Sparkles,
   useDetectGPU
 } from '@react-three/drei'
-import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
-// Memoized materials for reuse
-const goldMaterial = new THREE.MeshStandardMaterial({
+// Shared materials — polished gold
+const chainMaterial = new THREE.MeshStandardMaterial({
   color: '#D4AF37',
-  metalness: 1,
-  roughness: 0.15,
-  envMapIntensity: 2,
+  metalness: 0.95,
+  roughness: 0.25,
+  envMapIntensity: 1.2,
 })
 
-const goldAccentMaterial = new THREE.MeshStandardMaterial({
+const ballMaterial = new THREE.MeshStandardMaterial({
   color: '#B8941F',
-  metalness: 1,
-  roughness: 0.1,
-  envMapIntensity: 1.5,
+  metalness: 0.95,
+  roughness: 0.2,
+  envMapIntensity: 1.2,
 })
 
-function DiamondRing() {
-  const ringRef = useRef<THREE.Group>(null)
-  const diamondRef = useRef<THREE.Mesh>(null)
+const LINK_COUNT = 20
+const NECKLACE_RADIUS = 2.2
 
-  // Optimized animation loop - runs only when needed
+function ChainLinkNecklace() {
+  const necklaceRef = useRef<THREE.Group>(null)
+
   useFrame((state, delta) => {
-    if (ringRef.current) {
-      ringRef.current.rotation.y += delta * 0.15
-      ringRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.1
-    }
-    
-    if (diamondRef.current) {
-      diamondRef.current.rotation.y += delta * 0.5
+    if (necklaceRef.current) {
+      necklaceRef.current.rotation.y += delta * 0.12
+      necklaceRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.25) * 0.03
     }
   })
 
-  // Memoize prongs to prevent recreation
-  const prongs = useMemo(() => {
-    return [0, 1, 2, 3].map((i) => {
-      const angle = (i / 4) * Math.PI * 2
-      const x = Math.cos(angle) * 0.8
-      const z = Math.sin(angle) * 0.8
-      return (
-        <mesh key={i} position={[x, 0.3, z]}>
-          <cylinderGeometry args={[0.03, 0.04, 0.4, 6]} />
-          <meshStandardMaterial
-            color="#D4AF37"
-            metalness={1}
-            roughness={0.1}
-            envMapIntensity={2}
-          />
-        </mesh>
-      )
-    })
+  const { links, balls } = useMemo(() => {
+    const linkData: Array<{
+      x: number; y: number; z: number
+      angle: number; isVertical: boolean
+    }> = []
+    const ballData: Array<{ x: number; y: number; z: number }> = []
+
+    for (let i = 0; i < LINK_COUNT; i++) {
+      const angle = (i / LINK_COUNT) * Math.PI * 2
+      const x = Math.cos(angle) * NECKLACE_RADIUS
+      const z = Math.sin(angle) * NECKLACE_RADIUS
+      const isVertical = i % 2 === 0
+
+      linkData.push({ x, y: 0, z, angle, isVertical })
+
+      // Ball joint halfway to the next link
+      const midAngle = ((i + 0.5) / LINK_COUNT) * Math.PI * 2
+      ballData.push({
+        x: Math.cos(midAngle) * NECKLACE_RADIUS,
+        y: 0,
+        z: Math.sin(midAngle) * NECKLACE_RADIUS,
+      })
+    }
+
+    return { links: linkData, balls: ballData }
   }, [])
 
   return (
-    <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.3}>
-      <group ref={ringRef}>
-        {/* Ring Band - Reduced segments */}
-        <mesh position={[0, 0, 0]}>
-          <torusGeometry args={[1.2, 0.15, 16, 32]} />
-          <primitive object={goldMaterial} attach="material" />
-        </mesh>
+    <Float speed={1.5} rotationIntensity={0.15} floatIntensity={0.25}>
+      <group ref={necklaceRef} rotation={[0.35, 0, 0.08]}>
+        {/* Chain Links — elongated torus, alternating orientation */}
+        {links.map((link, i) => (
+          <group
+            key={`link-${i}`}
+            position={[link.x, link.y, link.z]}
+            rotation={[0, -link.angle + Math.PI / 2, 0]}
+          >
+            <mesh
+              rotation={link.isVertical ? [0, 0, 0] : [Math.PI / 2, 0, 0]}
+              scale={[1.9, 1, 1]}
+            >
+              <torusGeometry args={[0.17, 0.038, 12, 28]} />
+              <primitive object={chainMaterial} attach="material" />
+            </mesh>
+          </group>
+        ))}
 
-        {/* Ring Inner Details - Reduced segments */}
-        <mesh position={[0, 0, 0]}>
-          <torusGeometry args={[1.05, 0.02, 12, 24]} />
-          <primitive object={goldAccentMaterial} attach="material" />
-        </mesh>
+        {/* Ball Joints at connection points */}
+        {balls.map((ball, i) => (
+          <mesh key={`ball-${i}`} position={[ball.x, ball.y, ball.z]}>
+            <sphereGeometry args={[0.075, 14, 14]} />
+            <primitive object={ballMaterial} attach="material" />
+          </mesh>
+        ))}
 
-        {/* Prongs */}
-        {prongs}
-
-        {/* Diamond - Optimized transmission settings */}
-        <mesh 
-          ref={diamondRef}
-          position={[0, 0.8, 0]} 
-          scale={[0.6, 0.8, 0.6]}
-        >
-          <octahedronGeometry args={[0.5, 0]} />
-          <MeshTransmissionMaterial
-            backside
-            samples={8}
-            resolution={256}
-            transmission={0.95}
-            roughness={0}
-            thickness={0.5}
-            ior={2.4}
-            chromaticAberration={0.04}
-            anisotropy={0.2}
-            distortion={0}
-            clearcoat={1}
-            attenuationDistance={0.5}
-            attenuationColor="#ffffff"
-            color="#ffffff"
-          />
-        </mesh>
-
-        {/* Diamond Facets Highlights */}
-        <mesh position={[0, 0.8, 0]} scale={[0.65, 0.85, 0.65]}>
-          <octahedronGeometry args={[0.5, 1]} />
-          <meshBasicMaterial
-            color="#ffffff"
-            transparent
-            opacity={0.3}
-            wireframe
-          />
-        </mesh>
-
-        {/* Reduced sparkles */}
+        {/* Subtle sparkles around the necklace */}
         <Sparkles
-          count={15}
-          scale={[3, 3, 3]}
-          size={1.5}
+          count={20}
+          scale={[6, 3, 6]}
+          size={1.2}
           speed={0.3}
           opacity={0.5}
-          color="#D4AF37"
+          color="#FFE87C"
         />
       </group>
     </Float>
@@ -138,42 +113,38 @@ function DiamondRing() {
 function CinematicLighting() {
   return (
     <>
-      {/* Key Light - Reduced shadow quality */}
-      <SpotLight
+      {/* Key Light */}
+      <spotLight
         position={[5, 8, 5]}
-        angle={0.3}
-        penumbra={0.5}
-        intensity={150}
-        castShadow
-        shadow-bias={-0.0001}
-        shadow-mapSize={1024}
+        angle={0.35}
+        penumbra={0.6}
+        intensity={30}
         color="#ffffff"
       />
 
-      {/* Fill Light - No shadows */}
-      <SpotLight
-        position={[-5, 5, -3]}
-        angle={0.4}
+      {/* Fill Light — warm gold tint */}
+      <spotLight
+        position={[-5, 4, -2]}
+        angle={0.5}
         penumbra={1}
-        intensity={80}
-        color="#E5C158"
+        intensity={15}
+        color="#FFE8A0"
       />
 
-      {/* Rim Light */}
+      {/* Rim Light — subtle back edge */}
       <spotLight
         position={[0, 2, -5]}
         angle={0.5}
         penumbra={1}
-        intensity={100}
-        color="#D4AF37"
+        intensity={12}
+        color="#FFF5D0"
       />
 
-      {/* Simplified lighting - removed extra point lights */}
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={0.6} />
 
       <hemisphereLight
-        color="#ffffff"
-        groundColor="#1A1A1A"
+        color="#fff8f0"
+        groundColor="#f5ede0"
         intensity={0.5}
       />
     </>
@@ -182,19 +153,16 @@ function CinematicLighting() {
 
 function Scene() {
   const GPUTier = useDetectGPU()
-  
-  // Adaptive quality based on GPU
+
   const isMobile = GPUTier?.isMobile || false
   const isLowEnd = GPUTier?.tier === 0 || GPUTier?.tier === 1
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 1, 6]} fov={45} />
+      <PerspectiveCamera makeDefault position={[0, 1.5, 6.5]} fov={45} />
 
-      {/* Cinematic Lighting Setup */}
       <CinematicLighting />
 
-      {/* Optimized Environment */}
       <Environment
         preset="studio"
         background={false}
@@ -202,33 +170,20 @@ function Scene() {
         resolution={128}
       />
 
-      {/* Main 3D Model */}
-      <DiamondRing />
+      {/* Main 3D Model — Chain Link Necklace */}
+      <ChainLinkNecklace />
 
-      {/* Optimized Ground Shadows */}
+      {/* Ground shadow */}
       <ContactShadows
-        position={[0, -1.8, 0]}
-        opacity={0.4}
-        scale={8}
-        blur={2}
+        position={[0, -2, 0]}
+        opacity={0.2}
+        scale={10}
+        blur={2.5}
         far={4}
         resolution={256}
-        color="#D4AF37"
+        color="#888888"
       />
 
-      {/* Conditional Post-processing - disabled on low-end devices */}
-      {!isLowEnd && !isMobile && (
-        <EffectComposer multisampling={0}>
-          <Bloom
-            intensity={0.5}
-            luminanceThreshold={0.4}
-            luminanceSmoothing={0.7}
-            mipmapBlur
-          />
-        </EffectComposer>
-      )}
-
-      {/* Optimized Controls */}
       <OrbitControls
         enableZoom={false}
         enablePan={false}
@@ -251,7 +206,7 @@ export default function Hero3DScene() {
       dpr={[1, 1.5]}
       performance={{ min: 0.5 }}
       frameloop="demand"
-      gl={{ 
+      gl={{
         antialias: false,
         alpha: true,
         powerPreference: 'high-performance',

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { ArrowDown } from 'lucide-react'
 import gsap from 'gsap'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -39,25 +38,17 @@ export default function Hero() {
     const ctx = gsap.context(() => {
       gsap.from('.hero-title', {
         opacity: 0,
-        y: 100,
+        y: 40,
         duration: 1.2,
-        delay: 0.5,
-        ease: 'power4.out',
-      })
-
-      gsap.from('.hero-subtitle', {
-        opacity: 0,
-        y: 50,
-        duration: 1,
-        delay: 0.8,
+        delay: 0.6,
         ease: 'power3.out',
       })
 
       gsap.from('.hero-cta', {
         opacity: 0,
-        y: 30,
-        duration: 0.8,
-        delay: 1.1,
+        y: 20,
+        duration: 0.9,
+        delay: 1.0,
         ease: 'power2.out',
       })
     }, containerRef)
@@ -68,24 +59,25 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative h-screen w-full overflow-hidden bg-luxury-black"
+      className="relative h-screen w-full overflow-hidden"
+      style={{
+        background: 'linear-gradient(to bottom, #E896B8 0%, #F0B0C8 25%, #F8C8D8 55%, #FDDDE6 75%, #F8C8D8 100%)',
+      }}
     >
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-radial from-luxury-charcoal via-luxury-black to-luxury-black opacity-60" />
 
-      {/* Animated particles */}
+      {/* Animated shimmer particles */}
       <div className="absolute inset-0">
-        {Array.from({ length: 30 }).map((_, i) => (
+        {Array.from({ length: 25 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-luxury-gold rounded-full"
+            className="absolute w-1 h-1 bg-white rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
             animate={{
-              opacity: [0.2, 0.8, 0.2],
-              scale: [1, 1.5, 1],
+              opacity: [0.15, 0.6, 0.15],
+              scale: [1, 1.8, 1],
             }}
             transition={{
               duration: 3 + Math.random() * 2,
@@ -116,61 +108,37 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Content */}
-      <div className="relative z-10 h-full flex items-center justify-center">
-        <div className="luxury-container text-center">
-          <motion.div style={{ opacity, scale }}>
-            <motion.h1
-              className="hero-title font-display text-display-lg md:text-display-xl text-gradient glow-text mb-6"
-              initial={{ opacity: 0 }}
-            >
-              Timeless Elegance
-            </motion.h1>
+      {/* Bottom fade — behind text, dark enough for white text */}
+      <div className="absolute bottom-0 left-0 right-0 h-72 z-10 pointer-events-none"
+        style={{ background: 'linear-gradient(to top, rgba(80,20,40,0.72) 0%, rgba(100,30,55,0.45) 45%, transparent 100%)' }}
+      />
 
-            <motion.p
-              className="hero-subtitle text-xl md:text-2xl text-luxury-champagne/80 mb-12 max-w-2xl mx-auto font-serif"
-              initial={{ opacity: 0 }}
-            >
-              Discover exceptional jewelry crafted with passion, precision, and
-              unparalleled artistry
-            </motion.p>
+      {/* Text overlay — bottom center, Tiffany style */}
+      <div className="absolute inset-x-0 bottom-12 z-20 flex flex-col items-center text-center px-4">
+        <h1
+          className="hero-title font-serif mb-6"
+          style={{
+            color: '#ffffff',
+            fontSize: 'clamp(2rem, 5.5vw, 4.2rem)',
+            letterSpacing: '0.04em',
+            lineHeight: 1.1,
+            fontWeight: 700,
+            textShadow: '0 2px 16px rgba(60,15,30,0.5)',
+          }}
+        >
+          Elegance Crafted By Maria
+        </h1>
 
-            <motion.div
-              className="hero-cta flex flex-col sm:flex-row gap-6 justify-center items-center"
-              initial={{ opacity: 0 }}
-            >
-              <Link href="/shop" className="luxury-btn-primary">
-                <span>Explore Collections</span>
-              </Link>
-              <Link href="/about" className="luxury-btn">
-                <span>Our Story</span>
-              </Link>
-            </motion.div>
-          </motion.div>
+        <div className="hero-cta">
+          <Link
+            href="/shop"
+            className="inline-block px-10 py-3 border border-white text-white text-xs uppercase tracking-[0.2em] font-sans
+                       hover:bg-white hover:text-[#3D1A28] transition-all duration-300"
+          >
+            Shop Now
+          </Link>
         </div>
       </div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        animate={{
-          y: [0, 10, 0],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-        style={{ opacity }}
-      >
-        <span className="text-luxury-gold/60 text-xs uppercase tracking-widest">
-          Scroll
-        </span>
-        <ArrowDown className="text-luxury-gold/60" size={24} />
-      </motion.div>
-
-      {/* Bottom gradient overlay */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-luxury-black to-transparent" />
     </section>
   )
 }

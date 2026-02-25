@@ -42,8 +42,8 @@ export default function CraftsmanshipSection() {
         className="absolute inset-0 opacity-[0.03]"
         style={{
           backgroundImage: `
-            linear-gradient(#D4AF37 1px, transparent 1px),
-            linear-gradient(90deg, #D4AF37 1px, transparent 1px)
+            linear-gradient(#D4899E 1px, transparent 1px),
+            linear-gradient(90deg, #D4899E 1px, transparent 1px)
           `,
           backgroundSize: '50px 50px',
         }}
@@ -98,54 +98,6 @@ export default function CraftsmanshipSection() {
             )
           })}
         </div>
-
-        {/* Process Timeline */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-24"
-        >
-          <h3 className="font-display text-3xl text-center text-luxury-white mb-16">
-            Our Process
-          </h3>
-          
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute top-1/2 left-0 right-0 h-px bg-luxury-gold/30 hidden lg:block" />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-              {[
-                { step: '01', title: 'Design', desc: 'Conceptualization' },
-                { step: '02', title: 'Selection', desc: 'Material sourcing' },
-                { step: '03', title: 'Crafting', desc: 'Expert creation' },
-                { step: '04', title: 'Setting', desc: 'Gem placement' },
-                { step: '05', title: 'Finishing', desc: 'Final polish' },
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                  transition={{
-                    duration: 0.6,
-                    delay: 0.8 + index * 0.1,
-                  }}
-                  className="relative text-center"
-                >
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-luxury-charcoal border-2 border-luxury-gold rounded-full mb-4 relative z-10">
-                    <span className="font-display text-luxury-gold text-lg">
-                      {item.step}
-                    </span>
-                  </div>
-                  <h4 className="font-display text-lg text-luxury-white mb-2">
-                    {item.title}
-                  </h4>
-                  <p className="text-luxury-white/60 text-sm">{item.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
       </div>
     </section>
   )

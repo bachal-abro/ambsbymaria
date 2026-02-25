@@ -22,7 +22,7 @@ export default function CartDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleCart}
-            className="fixed inset-0 bg-luxury-black/80 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
           />
 
           {/* Drawer */}
@@ -31,7 +31,7 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.3 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-luxury-charcoal z-50 flex flex-col shadow-luxury-elevation"
+            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white z-50 flex flex-col shadow-luxury-elevation"
           >
             {/* Header */}
             <div className="p-6 border-b border-luxury-charcoal-light flex items-center justify-between">
@@ -54,10 +54,10 @@ export default function CartDrawer() {
               {items.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center">
                   <ShoppingBag className="text-luxury-gold/30 mb-4" size={64} />
-                  <p className="text-luxury-white/60 text-lg mb-2">
+                  <p className="text-luxury-white/70 text-lg mb-2">
                     Your cart is empty
                   </p>
-                  <p className="text-luxury-white/40 text-sm mb-6">
+                  <p className="text-luxury-white/60 text-sm mb-6">
                     Add some luxury pieces to get started
                   </p>
                   <Link
@@ -140,7 +140,7 @@ export default function CartDrawer() {
                         onClick={() =>
                           removeItem(item.product.id, item.selectedMaterial.id)
                         }
-                        className="text-luxury-white/40 hover:text-luxury-gold transition-colors"
+                        className="text-luxury-white/60 hover:text-luxury-gold transition-colors"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -155,7 +155,7 @@ export default function CartDrawer() {
               <div className="p-6 border-t border-luxury-charcoal-light">
                 {/* Subtotal */}
                 <div className="flex items-center justify-between mb-6">
-                  <span className="text-luxury-white/60 uppercase text-sm tracking-wider">
+                  <span className="text-luxury-white/75 uppercase text-sm tracking-wider">
                     Subtotal
                   </span>
                   <span className="text-luxury-gold font-display text-2xl">
@@ -163,7 +163,7 @@ export default function CartDrawer() {
                   </span>
                 </div>
 
-                <p className="text-luxury-white/40 text-xs text-center mb-6">
+                <p className="text-luxury-white/60 text-xs text-center mb-6">
                   Shipping and taxes calculated at checkout
                 </p>
 
