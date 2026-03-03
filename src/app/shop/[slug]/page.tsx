@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { ShoppingBag, Heart, Share2, Check } from 'lucide-react'
-import Product3DViewer from '@/components/3d/Product3DViewer'
 import { products, materials } from '@/lib/data'
 import { formatPrice } from '@/lib/utils'
 import { useCartStore } from '@/store/cartStore'
@@ -29,7 +28,6 @@ export default function ProductDetailPage({
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
-  const [view3D, setView3D] = useState(true)
 
   const addItem = useCartStore((state) => state.addItem)
 
@@ -52,71 +50,36 @@ export default function ProductDetailPage({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              {/* View Toggle */}
-              <div className="flex items-center gap-4 mb-6">
-                <button
-                  onClick={() => setView3D(true)}
-                  className={`px-4 py-2 text-sm transition-all duration-300 ${view3D
-                    ? 'text-luxury-gold border-b-2 border-luxury-gold'
-                    : 'text-luxury-white/60'
-                    }`}
-                >
-                  3D View
-                </button>
-                <button
-                  onClick={() => setView3D(false)}
-                  className={`px-4 py-2 text-sm transition-all duration-300 ${!view3D
-                    ? 'text-luxury-gold border-b-2 border-luxury-gold'
-                    : 'text-luxury-white/60'
-                    }`}
-                >
-                  Photos
-                </button>
-              </div>
-
               {/* Main Display */}
               <div className="luxury-card overflow-hidden mb-6">
-                {view3D ? (
-                  <div className="aspect-square">
-                    <Product3DViewer
-                      category={product.category}
-                      material={selectedMaterial}
-                      autoRotate={true}
-                    />
-                  </div>
-                ) : (
-                  <div className="relative aspect-square bg-luxury-charcoal-light">
-                    <Image
-                      src={product.images[selectedImage]}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                      priority
-                    />
-                  </div>
-                )}
+                <div className="relative aspect-square bg-luxury-charcoal-light">
+                  <Image
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                </div>
               </div>
 
               {/* Thumbnails */}
-              {!view3D && (
-                <div className="grid grid-cols-4 gap-4">
-                  {product.images.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImage(index)}
-                      className={`relative aspect-square luxury-card overflow-hidden ${selectedImage === index ? 'ring-2 ring-luxury-gold' : ''
-                        }`}
-                    >
-                      <Image
-                        src={image}
-                        alt={`${product.name} ${index + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="grid grid-cols-4 gap-4">
+                {product.images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`relative aspect-square luxury-card overflow-hidden ${selectedImage === index ? 'ring-2 ring-luxury-gold' : ''}`}
+                  >
+                    <Image
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             </motion.div>
 
             {/* Product Info */}

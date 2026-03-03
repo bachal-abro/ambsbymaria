@@ -124,14 +124,15 @@ export default function Hero() {
       {/* Text overlay — bottom center, Tiffany style */}
       <div className="absolute inset-x-0 bottom-12 z-20 flex flex-col items-center text-center px-4">
         <h1
-          className="hero-title font-serif mb-6"
+          className="hero-title mb-6"
           style={{
+            fontFamily: 'var(--font-great-vibes), cursive',
             color: '#ffffff',
-            fontSize: 'clamp(2rem, 5.5vw, 4.2rem)',
-            letterSpacing: '0.04em',
-            lineHeight: 1.1,
-            fontWeight: 700,
-            textShadow: '0 2px 16px rgba(60,15,30,0.5)',
+            fontSize: 'clamp(2.8rem, 7.5vw, 6rem)',
+            letterSpacing: '0.03em',
+            lineHeight: 1.15,
+            fontWeight: 400,
+            textShadow: '0 2px 24px rgba(60,15,30,0.55), 0 0 60px rgba(255,200,220,0.25)',
           }}
         >
           Elegance Crafted By Maria

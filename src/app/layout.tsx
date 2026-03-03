@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display, Cormorant_Garamond } from 'next/font/google'
+import { Inter, Playfair_Display, Cormorant_Garamond, Great_Vibes } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -25,6 +25,13 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 })
 
+const greatVibes = Great_Vibes({
+  weight: ['400'],
+  subsets: ['latin'],
+  variable: '--font-great-vibes',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: 'AmbsbyMaria | Premium Handcrafted Jewelry',
   description: 'Discover exquisite handcrafted jewelry by Maria. Luxury rings, necklaces, bracelets, and earrings crafted with the finest materials.',
@@ -37,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} ${cormorant.variable} ${greatVibes.variable}`}>
       <body>
         <Header />
         <CartDrawer />

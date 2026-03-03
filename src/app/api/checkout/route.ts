@@ -53,11 +53,11 @@ export async function POST(request: Request) {
 
             resolvedItems.push({ productId: product.id, materialId: material.id, quantity: item.quantity })
 
-            const unitPrice = Math.round((product.price + material.price) * 100) // cents
+            const unitPrice = Math.round((product.price + material.price) * 100) // paisas
 
             lineItems.push({
                 price_data: {
-                    currency: 'usd',
+                    currency: 'pkr',
                     product_data: {
                         name: `${product.name} – ${material.name}`,
                         images: (JSON.parse(product.images) as string[]).slice(0, 1),

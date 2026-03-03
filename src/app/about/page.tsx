@@ -156,6 +156,41 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Logistics Partner */}
+      <section className="py-20 bg-luxury-black">
+        <div className="luxury-container">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <p className="text-luxury-white/40 text-xs uppercase tracking-widest mb-8">
+              Official Logistics Partner
+            </p>
+            <div className="inline-flex items-center space-x-6 px-10 py-6 border border-gray-200 bg-white">
+              <Image
+                src="/mp-logo.svg"
+                alt="M&P Express Logistics"
+                width={130}
+                height={107}
+                className="h-20 w-auto object-contain"
+                style={{ width: 'auto' }}
+              />
+              <div className="w-px h-14 bg-gray-200" />
+              <div className="text-left">
+                <p className="text-luxury-charcoal text-sm font-semibold">M&amp;P Express Logistics</p>
+                <p className="text-gray-500 text-xs mt-1">Nationwide delivery across Pakistan</p>
+              </div>
+            </div>
+            <p className="mt-6 text-luxury-white/50 text-sm max-w-md mx-auto">
+              We partner with M&amp;P Express to ensure your precious pieces arrive safely and on time, anywhere in Pakistan.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Craftsmanship Detail */}
       <section id="craftsmanship" className="py-32 bg-luxury-charcoal">
         <div className="luxury-container">

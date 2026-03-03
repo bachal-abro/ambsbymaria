@@ -129,8 +129,26 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Logistics Partner */}
+        <div className="mt-16 pt-10 border-t border-luxury-charcoal-light flex flex-col items-center space-y-4">
+          <p className="text-luxury-white/40 text-xs uppercase tracking-widest">
+            Official Logistics Partner
+          </p>
+          <div className="flex items-center space-x-4 px-6 py-3 border border-luxury-gold/30 bg-white/95">
+            <Image
+              src="/mp-logo.svg"
+              alt="M&P Express Logistics"
+              width={90}
+              height={74}
+              className="h-12 w-auto object-contain"
+              style={{ width: 'auto' }}
+            />
+            <span className="text-gray-500 text-xs border-l border-gray-300 pl-4">Official Courier Partner</span>
+          </div>
+        </div>
+
         {/* Bottom */}
-        <div className="mt-16 pt-8 border-t border-luxury-charcoal-light flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div className="mt-8 pt-8 border-t border-luxury-charcoal-light flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-luxury-white/60 text-sm">
             &copy; {new Date().getFullYear()} AmbsbyMaria. All rights
             reserved.

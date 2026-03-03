@@ -1,15 +1,14 @@
 'use client'
 
-import { useRef, useState, Suspense } from 'react'
+import { useRef, useState, Suspense, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { 
-  OrbitControls, 
-  Environment, 
+import {
+  OrbitControls,
+  Environment,
   ContactShadows,
   PerspectiveCamera,
   useGLTF,
-  Stage,
-  Float
+  Float,
 } from '@react-three/drei'
 import { motion } from 'framer-motion'
 import * as THREE from 'three'
@@ -221,96 +220,151 @@ function Earrings({ material }: JewelryModelProps) {
   )
 }
 
+// ─── Real GLB Model (from Meshy AI) ─────────────────────────────────────────
+
+function GLBModel({ url, material }: { url: string; material: Material }) {
+  const { scene } = useGLTF(url)
+  const rotRef = useRef<THREE.Group>(null)
+
+  // Clone + apply metalness/roughness from the selected material
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone(true)
+    clone.traverse((node) => {
+      const mesh = node as THREE.Mesh
+      if (mesh.isMesh) {
+        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+        mats.forEach((m, idx) => {
+          if (m instanceof THREE.MeshStandardMaterial) {
+            const derived = m.clone()
+            derived.metalness = material.metallic
+            derived.roughness = material.roughness
+            derived.envMapIntensity = 1.5
+            derived.needsUpdate = true
+            if (Array.isArray(mesh.material)) {
+              (mesh.material as THREE.Material[])[idx] = derived
+            } else {
+              mesh.material = derived
+            }
+          }
+        })
+      }
+    })
+    return clone
+  }, [scene, material])
+
+  // Auto-centre and normalise to fit the canvas
+  const { scale, offset } = useMemo(() => {
+    const box = new THREE.Box3().setFromObject(clonedScene)
+    const size = box.getSize(new THREE.Vector3())
+    const center = box.getCenter(new THREE.Vector3())
+    const maxDim = Math.max(size.x, size.y, size.z) || 1
+    const s = 3 / maxDim
+    return { scale: s, offset: center.multiplyScalar(-s) }
+  }, [clonedScene])
+
+  useFrame(() => { if (rotRef.current) rotRef.current.rotation.y += 0.003 })
+
+  return (
+    <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
+      <group ref={rotRef} scale={[scale, scale, scale]} position={[offset.x, offset.y, offset.z]}>
+        <primitive object={clonedScene} castShadow receiveShadow />
+      </group>
+    </Float>
+  )
+}
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type JewelryCategory = 'rings' | 'necklaces' | 'bracelets' | 'earrings'
+
+const PROCEDURAL_MAP: Record<JewelryCategory, React.ComponentType<JewelryModelProps>> = {
+  rings: Ring,
+  necklaces: Necklace,
+  bracelets: Bracelet,
+  earrings: Earrings,
+}
+
 interface Product3DViewerProps {
-  category: 'rings' | 'necklaces' | 'bracelets' | 'earrings'
+  category: JewelryCategory | string
   material: Material
-  modelPath?: string
+  /** URL of AI-generated GLB model. When provided, renders real geometry instead of procedural mesh. */
+  modelUrl?: string
   autoRotate?: boolean
   className?: string
 }
 
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function Product3DViewer({
   category,
   material,
-  modelPath,
+  modelUrl,
   autoRotate = true,
   className = '',
 }: Product3DViewerProps) {
-  const [loading, setLoading] = useState(true)
+  const [ready, setReady] = useState(false)
 
-  const JewelryComponent = {
-    rings: Ring,
-    necklaces: Necklace,
-    bracelets: Bracelet,
-    earrings: Earrings,
-  }[category]
+  const ProceduralModel = PROCEDURAL_MAP[category as JewelryCategory] ?? Ring
 
   return (
     <div className={`relative w-full h-full ${className}`}>
-      {loading && (
+      {/* Loading veil */}
+      {!ready && (
         <motion.div
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
-          transition={{ delay: 1, duration: 0.5 }}
-          className="absolute inset-0 flex items-center justify-center bg-white z-10"
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="absolute inset-0 flex items-center justify-center bg-luxury-charcoal z-10 pointer-events-none"
         >
-          <div className="loading-spinner w-12 h-12 border-2 border-luxury-gold border-t-transparent rounded-full" />
+          <div className="w-10 h-10 border-2 border-luxury-gold border-t-transparent rounded-full animate-spin" />
         </motion.div>
       )}
-      
+
+      {/* Source badge */}
+      {ready && (
+        <div className="absolute bottom-3 left-3 z-10 pointer-events-none">
+          <span className={`px-2 py-0.5 text-[10px] rounded-full border ${
+            modelUrl
+              ? 'border-luxury-gold/50 text-luxury-gold/70 bg-luxury-gold/10'
+              : 'border-luxury-white/10 text-luxury-white/30'
+          }`}>
+            {modelUrl ? '✦ AI 3D Model' : '3D Preview'}
+          </span>
+        </div>
+      )}
+
       <Canvas
         shadows
         dpr={[1, 2]}
         camera={{ position: [0, 0, 5], fov: 50 }}
-        gl={{ 
-          antialias: true,
-          alpha: true,
-          powerPreference: 'high-performance'
-        }}
-        onCreated={() => setLoading(false)}
+        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        onCreated={() => setReady(true)}
       >
         <Suspense fallback={null}>
           <PerspectiveCamera makeDefault position={[0, 0, 5]} />
-          
+
           {/* Lighting */}
           <ambientLight intensity={0.4} />
-          <spotLight
-            position={[5, 5, 5]}
-            angle={0.3}
-            penumbra={1}
-            intensity={2}
-            castShadow
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
-          />
+          <spotLight position={[5, 5, 5]} angle={0.3} penumbra={1} intensity={2} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
           <pointLight position={[-5, -5, -5]} intensity={0.5} />
           <pointLight position={[0, 0, 5]} intensity={0.3} color="#D4899E" />
 
-          {/* Environment */}
-          <Environment
-            preset="studio"
-            background={false}
-            blur={0.8}
-          />
+          <Environment preset="studio" background={false} blur={0.8} />
 
-          {/* Model */}
-          <JewelryComponent material={material} modelPath={modelPath} />
+          {/* Real GLB model or procedural fallback */}
+          {modelUrl ? (
+            <GLBModel url={modelUrl} material={material} />
+          ) : (
+            <ProceduralModel material={material} />
+          )}
 
-          {/* Shadows */}
-          <ContactShadows
-            position={[0, -2, 0]}
-            opacity={0.4}
-            scale={10}
-            blur={2}
-            far={4}
-          />
+          <ContactShadows position={[0, -2, 0]} opacity={0.4} scale={10} blur={2} far={4} />
 
-          {/* Controls */}
           <OrbitControls
-            enableZoom={true}
+            enableZoom
             enablePan={false}
-            minDistance={3}
-            maxDistance={8}
+            minDistance={2}
+            maxDistance={9}
             autoRotate={autoRotate}
             autoRotateSpeed={0.5}
             dampingFactor={0.05}

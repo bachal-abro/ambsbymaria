@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Lock, ShoppingBag, MessageSquare, RefreshCw, Eye, Loader2,
-    CheckCircle, Package, Plus, Pencil, Trash2, X, Save,
+    CheckCircle, Package, Plus, Pencil, Trash2, X, Save, Upload, Link,
 } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import Image from 'next/image'
@@ -48,8 +48,9 @@ const STATUS_COLORS: Record<string, string> = {
     delivered: 'text-green-400 border-green-400/30 bg-green-400/10',
 }
 
-const CATEGORIES = ['rings', 'necklaces', 'bracelets', 'earrings']
+const DEFAULT_CATEGORIES = ['rings', 'necklaces', 'bracelets', 'earrings']
 const MATERIAL_SLUGS = ['rose-gold', 'yellow-gold', 'white-gold', 'platinum']
+const CATEGORIES_KEY = 'admin_categories'
 
 const EMPTY_PRODUCT = {
     name: '', slug: '', sku: '', description: '', price: 0,
@@ -79,7 +80,28 @@ export default function AdminPage() {
     const [editingProduct, setEditingProduct] = useState<Product | null>(null)
     const [productForm, setProductForm] = useState<typeof EMPTY_PRODUCT>(EMPTY_PRODUCT)
     const [productLoading, setProductLoading] = useState(false)
+    const [productError, setProductError] = useState<string | null>(null)
+    const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
+    const [urlModeIdx, setUrlModeIdx] = useState<Set<number>>(new Set())
+    const fileInputRef = useRef<HTMLInputElement>(null)
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+
+
+    // Category management state
+    const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES)
+    const [newCategory, setNewCategory] = useState('')
+    const [showCatManager, setShowCatManager] = useState(false)
+
+    // Load persisted categories from localStorage
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem(CATEGORIES_KEY)
+            if (stored) {
+                const parsed = JSON.parse(stored) as string[]
+                if (Array.isArray(parsed) && parsed.length > 0) setCategories(parsed)
+            }
+        } catch { /* ignore */ }
+    }, [])
 
     // ── Auth ──────────────────────────────────────────────────────────────────
     const login = async (e: React.FormEvent) => {
@@ -136,14 +158,40 @@ export default function AdminPage() {
     }
 
     // ── Products CRUD ─────────────────────────────────────────────────────────
+    // ── Category management ────────────────────────────────────────────────────
+    const persistCategories = (cats: string[]) => {
+        setCategories(cats)
+        localStorage.setItem(CATEGORIES_KEY, JSON.stringify(cats))
+    }
+
+    const addCategory = () => {
+        const trimmed = newCategory.trim().toLowerCase().replace(/\s+/g, '-')
+        if (!trimmed || categories.includes(trimmed)) return
+        persistCategories([...categories, trimmed])
+        setNewCategory('')
+    }
+
+    const removeCategory = (cat: string) => {
+        if (categories.length <= 1) return
+        const updated = categories.filter((c) => c !== cat)
+        persistCategories(updated)
+        // If current form category was removed, reset to first available
+        if (productForm.category === cat)
+            setProductForm((p) => ({ ...p, category: updated[0] }))
+    }
+
     const openNewProduct = () => {
         setEditingProduct(null)
-        setProductForm({ ...EMPTY_PRODUCT })
+        setProductForm({ ...EMPTY_PRODUCT, category: categories[0] ?? 'rings' })
+        setProductError(null)
+        setUrlModeIdx(new Set())
         setShowProductForm(true)
     }
 
     const openEditProduct = (p: Product) => {
         setEditingProduct(p)
+        setProductError(null)
+        setUrlModeIdx(new Set())
         setProductForm({
             name: p.name, slug: p.slug, sku: p.sku, description: p.description,
             price: p.price, category: p.category, defaultMaterial: p.defaultMaterial,
@@ -174,8 +222,54 @@ export default function AdminPage() {
     }
 
     const addImageField = () => setProductForm((p) => ({ ...p, images: [...p.images, ''] }))
-    const removeImageField = (idx: number) =>
+    const removeImageField = (idx: number) => {
         setProductForm((p) => ({ ...p, images: p.images.filter((_, i) => i !== idx) }))
+        setUrlModeIdx((prev) => {
+            const next = new Set(prev)
+            next.delete(idx)
+            return next
+        })
+    }
+
+    const toggleUrlMode = (idx: number) => {
+        setUrlModeIdx((prev) => {
+            const next = new Set(prev)
+            if (next.has(idx)) next.delete(idx)
+            else next.add(idx)
+            return next
+        })
+    }
+
+    const uploadImage = async (idx: number, file: File) => {
+        if (!file.type.startsWith('image/')) return
+        setUploadingIdx(idx)
+        try {
+            const form = new FormData()
+            form.append('file', file)
+            const res = await fetch('/api/admin/upload', {
+                method: 'POST',
+                headers: { ...authHeader(adminPwd) },
+                body: form,
+            })
+            if (res.ok) {
+                const { url } = await res.json() as { url: string }
+                handleImageChange(idx, url)
+            } else {
+                const { error } = await res.json().catch(() => ({ error: 'Upload failed' })) as { error: string }
+                setProductError(error || 'Upload failed')
+            }
+        } catch {
+            setProductError('Network error during upload')
+        } finally {
+            setUploadingIdx(null)
+        }
+    }
+
+    const handleFileDrop = (idx: number, e: React.DragEvent) => {
+        e.preventDefault()
+        const file = e.dataTransfer.files[0]
+        if (file) uploadImage(idx, file)
+    }
 
     const autoSlug = () => {
         setProductForm((p) => ({
@@ -187,30 +281,44 @@ export default function AdminPage() {
     const saveProduct = async (e: React.FormEvent) => {
         e.preventDefault()
         setProductLoading(true)
+        setProductError(null)
 
         const payload = {
             ...productForm,
+            price: Number(productForm.price),
             images: productForm.images.filter(Boolean),
             materialSlugs: MATERIAL_SLUGS,
             ...(editingProduct ? { id: editingProduct.id } : {}),
         }
 
-        const res = await fetch('/api/admin/products', {
-            method: editingProduct ? 'PATCH' : 'POST',
-            headers: { 'Content-Type': 'application/json', ...authHeader(adminPwd) },
-            body: JSON.stringify(payload),
-        })
+        try {
+            const res = await fetch('/api/admin/products', {
+                method: editingProduct ? 'PATCH' : 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeader(adminPwd) },
+                body: JSON.stringify(payload),
+            })
 
-        if (res.ok) {
-            const saved: Product = await res.json()
-            if (editingProduct) {
-                setProducts((prev) => prev.map((p) => (p.id === saved.id ? saved : p)))
+            if (res.ok) {
+                const saved: Product = await res.json()
+                if (editingProduct) {
+                    setProducts((prev) => prev.map((p) => (p.id === saved.id ? saved : p)))
+                } else {
+                    setProducts((prev) => [saved, ...prev])
+                }
+                setShowProductForm(false)
             } else {
-                setProducts((prev) => [saved, ...prev])
+                const errData = await res.json().catch(() => null)
+                setProductError(
+                    errData?.error ||
+                    (res.status === 401 ? 'Unauthorized — check admin password.' : `Server error (${res.status}). Please try again.`)
+                )
             }
-            setShowProductForm(false)
+        } catch (err) {
+            setProductError('Network error — could not reach server.')
+            console.error(err)
+        } finally {
+            setProductLoading(false)
         }
-        setProductLoading(false)
     }
 
     const deleteProduct = async (id: string) => {
@@ -300,10 +408,59 @@ export default function AdminPage() {
                         <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                             <div className="flex justify-between items-center mb-6">
                                 <p className="text-luxury-white/50 text-sm">{products.length} products in catalogue</p>
-                                <button onClick={openNewProduct} className="luxury-btn-primary text-sm">
-                                    <span className="flex items-center gap-2"><Plus size={14} /> Add Product</span>
-                                </button>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setShowCatManager((v) => !v)}
+                                        className="luxury-btn text-sm"
+                                        title="Manage categories"
+                                    >
+                                        <span className="flex items-center gap-2"><Package size={14} /> Categories</span>
+                                    </button>
+                                    <button onClick={openNewProduct} className="luxury-btn-primary text-sm">
+                                        <span className="flex items-center gap-2"><Plus size={14} /> Add Product</span>
+                                    </button>
+                                </div>
                             </div>
+
+                            {/* ── Category Manager ── */}
+                            <AnimatePresence>
+                                {showCatManager && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="luxury-card p-5 mb-6 overflow-hidden"
+                                    >
+                                        <h3 className="text-luxury-gold text-xs uppercase tracking-wider mb-4">Manage Categories</h3>
+                                        <div className="flex flex-wrap gap-2 mb-4">
+                                            {categories.map((cat) => (
+                                                <span key={cat} className="flex items-center gap-1 px-3 py-1 rounded-full border border-luxury-gold/30 bg-luxury-gold/10 text-luxury-white/80 text-sm">
+                                                    {cat}
+                                                    <button
+                                                        onClick={() => removeCategory(cat)}
+                                                        disabled={categories.length <= 1}
+                                                        className="text-luxury-white/40 hover:text-red-400 ml-1 disabled:opacity-30 transition-colors"
+                                                        title="Remove category"
+                                                    >
+                                                        <X size={12} />
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <input
+                                                value={newCategory}
+                                                onChange={(e) => setNewCategory(e.target.value)}
+                                                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
+                                                className="luxury-input flex-1 text-sm"
+                                                placeholder="New category name (e.g. anklets)"
+                                            />
+                                            <button onClick={addCategory} className="luxury-btn-primary text-sm px-4">
+                                                <span className="flex items-center gap-1"><Plus size={14} /> Add</span>
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
                             {loading ? (
                                 <div className="text-center py-20"><Loader2 className="text-luxury-gold animate-spin mx-auto" size={40} /></div>
@@ -332,7 +489,7 @@ export default function AdminPage() {
                                                 <p className="text-luxury-white/40 text-xs mb-2 uppercase tracking-wider">{p.category} · {p.sku}</p>
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-luxury-gold font-display text-lg">{formatPrice(p.price)}</span>
-                                                    <div className="flex gap-2">
+                                                    <div className="flex gap-2 items-center">
                                                         <button
                                                             onClick={() => openEditProduct(p)}
                                                             className="p-2 text-luxury-white/50 hover:text-luxury-gold transition-colors"
@@ -467,13 +624,13 @@ export default function AdminPage() {
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 overflow-y-auto"
                         style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
-                        onClick={(e) => e.target === e.currentTarget && setShowProductForm(false)}
+                        onClick={(e) => { if (e.target === e.currentTarget) { setShowProductForm(false); setUrlModeIdx(new Set()) } }}
                     >
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
                             className="luxury-card w-full max-w-2xl p-8 relative"
                         >
-                            <button onClick={() => setShowProductForm(false)} className="absolute top-4 right-4 text-luxury-white/40 hover:text-luxury-white transition-colors">
+                            <button onClick={() => { setShowProductForm(false); setUrlModeIdx(new Set()) }} className="absolute top-4 right-4 text-luxury-white/40 hover:text-luxury-white transition-colors">
                                 <X size={20} />
                             </button>
 
@@ -503,7 +660,7 @@ export default function AdminPage() {
                                     <div>
                                         <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Category</label>
                                         <select name="category" value={productForm.category} onChange={handleProductFormChange} className="luxury-input">
-                                            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                                            {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                                         </select>
                                     </div>
                                 </div>
@@ -511,7 +668,7 @@ export default function AdminPage() {
                                 {/* Price + Default Material */}
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Price (USD) *</label>
+                                        <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Price (PKR) *</label>
                                         <input type="number" name="price" value={productForm.price} onChange={handleProductFormChange} required min={0} step={0.01} className="luxury-input" />
                                     </div>
                                     <div>
@@ -530,18 +687,121 @@ export default function AdminPage() {
 
                                 {/* Images */}
                                 <div>
-                                    <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-2">Image URLs</label>
-                                    <div className="space-y-2">
+                                    <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-2">Images</label>
+                                    <div className="space-y-3">
+                                        {/* Hidden file input */}
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0]
+                                                const idx = Number(e.target.dataset.idx ?? 0)
+                                                if (file) uploadImage(idx, file)
+                                                e.target.value = ''
+                                            }}
+                                        />
+
                                         {productForm.images.map((url, idx) => (
-                                            <div key={idx} className="flex gap-2">
-                                                <input value={url} onChange={(e) => handleImageChange(idx, e.target.value)} className="luxury-input flex-1" placeholder="https://images.unsplash.com/..." />
-                                                {productForm.images.length > 1 && (
-                                                    <button type="button" onClick={() => removeImageField(idx)} className="p-2 text-red-400 hover:text-red-300 transition-colors"><X size={14} /></button>
+                                            <div key={idx} className="rounded-lg border border-luxury-charcoal-light overflow-hidden">
+                                                {/* Drop zone / Preview */}
+                                                <div
+                                                    className={`relative flex items-center justify-center bg-luxury-charcoal-light transition-colors ${
+                                                        url ? 'h-40' : 'h-28'
+                                                    } ${uploadingIdx === idx ? 'opacity-60' : ''}`}
+                                                    onDragOver={(e) => e.preventDefault()}
+                                                    onDrop={(e) => handleFileDrop(idx, e)}
+                                                >
+                                                    {url ? (
+                                                        <>
+                                                            <Image
+                                                                src={url}
+                                                                alt={`Image ${idx + 1}`}
+                                                                fill
+                                                                className="object-cover"
+                                                                unoptimized
+                                                            />
+                                                            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        if (fileInputRef.current) {
+                                                                            fileInputRef.current.dataset.idx = String(idx)
+                                                                            fileInputRef.current.click()
+                                                                        }
+                                                                    }}
+                                                                    className="p-2 bg-black/60 rounded-full text-white hover:text-luxury-gold transition-colors"
+                                                                    title="Replace image"
+                                                                >
+                                                                    <Upload size={16} />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => toggleUrlMode(idx)}
+                                                                    className="p-2 bg-black/60 rounded-full text-white hover:text-luxury-gold transition-colors"
+                                                                    title="Enter URL manually"
+                                                                >
+                                                                    <Link size={16} />
+                                                                </button>
+                                                                {productForm.images.length > 1 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeImageField(idx)}
+                                                                        className="p-2 bg-black/60 rounded-full text-red-400 hover:text-red-300 transition-colors"
+                                                                        title="Remove"
+                                                                    >
+                                                                        <X size={16} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (fileInputRef.current) {
+                                                                    fileInputRef.current.dataset.idx = String(idx)
+                                                                    fileInputRef.current.click()
+                                                                }
+                                                            }}
+                                                            className="flex flex-col items-center gap-2 text-luxury-white/40 hover:text-luxury-gold transition-colors w-full h-full justify-center"
+                                                        >
+                                                            <Upload size={24} />
+                                                            <span className="text-xs">Click to upload or drag &amp; drop</span>
+                                                        </button>
+                                                    )}
+
+                                                    {/* Uploading overlay */}
+                                                    {uploadingIdx === idx && (
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                                                            <Loader2 size={24} className="text-luxury-gold animate-spin" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* URL input row (shown when empty or url-mode toggled) */}
+                                                {(!url || urlModeIdx.has(idx)) && (
+                                                    <div className="flex gap-2 p-2 border-t border-luxury-charcoal-light bg-luxury-charcoal/50">
+                                                        <input
+                                                            value={url}
+                                                            onChange={(e) => handleImageChange(idx, e.target.value)}
+                                                            className="luxury-input flex-1 text-xs py-1"
+                                                            placeholder="Or paste image URL…"
+                                                        />
+                                                        {url && (
+                                                            <button type="button" onClick={() => toggleUrlMode(idx)} className="p-1 text-luxury-white/40 hover:text-luxury-white transition-colors"><X size={12} /></button>
+                                                        )}
+                                                        {productForm.images.length > 1 && !url && (
+                                                            <button type="button" onClick={() => removeImageField(idx)} className="p-1 text-red-400 hover:text-red-300 transition-colors"><Trash2 size={12} /></button>
+                                                        )}
+                                                    </div>
                                                 )}
                                             </div>
                                         ))}
-                                        <button type="button" onClick={addImageField} className="text-luxury-gold/60 hover:text-luxury-gold text-xs flex items-center gap-1 transition-colors">
-                                            <Plus size={12} /> Add image URL
+
+                                        <button type="button" onClick={addImageField} className="text-luxury-gold/60 hover:text-luxury-gold text-xs flex items-center gap-1 transition-colors mt-1">
+                                            <Plus size={12} /> Add another image
                                         </button>
                                     </div>
                                 </div>
@@ -558,9 +818,16 @@ export default function AdminPage() {
                                     </label>
                                 </div>
 
+                                {/* Error */}
+                                {productError && (
+                                    <div className="p-3 rounded border border-red-500/40 bg-red-900/20 text-red-400 text-sm">
+                                        {productError}
+                                    </div>
+                                )}
+
                                 {/* Submit */}
                                 <div className="flex gap-3 pt-2">
-                                    <button type="button" onClick={() => setShowProductForm(false)} className="luxury-btn flex-1"><span>Cancel</span></button>
+                                    <button type="button" onClick={() => { setShowProductForm(false); setUrlModeIdx(new Set()) }} className="luxury-btn flex-1"><span>Cancel</span></button>
                                     <button type="submit" disabled={productLoading} className="luxury-btn-primary flex-1 disabled:opacity-50">
                                         <span className="flex items-center justify-center gap-2">
                                             {productLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 180" width="220" height="180">
+  <!-- White background with subtle border -->
+  <rect width="220" height="180" rx="8" fill="white"/>
+
+  <!-- M - gray -->
+  <text
+    x="18"
+    y="118"
+    font-family="Arial Black, Arial, sans-serif"
+    font-weight="900"
+    font-size="96"
+    fill="#808080"
+    letter-spacing="-4"
+  >M</text>
+
+  <!-- & - orange -->
+  <text
+    x="103"
+    y="118"
+    font-family="Arial Black, Arial, sans-serif"
+    font-weight="900"
+    font-size="96"
+    fill="#E8520A"
+  >&amp;</text>
+
+  <!-- P - orange -->
+  <text
+    x="152"
+    y="118"
+    font-family="Arial Black, Arial, sans-serif"
+    font-weight="900"
+    font-size="96"
+    fill="#E8520A"
+  >P</text>
+
+  <!-- TM superscript -->
+  <text
+    x="200"
+    y="42"
+    font-family="Arial, sans-serif"
+    font-weight="400"
+    font-size="13"
+    fill="#808080"
+  >TM</text>
+
+  <!-- MULLER & PHIPPS -->
+  <text
+    x="110"
+    y="148"
+    font-family="Arial, sans-serif"
+    font-weight="700"
+    font-size="14"
+    fill="#808080"
+    text-anchor="middle"
+    letter-spacing="1.5"
+  >MULLER &amp; PHIPPS</text>
+</svg>

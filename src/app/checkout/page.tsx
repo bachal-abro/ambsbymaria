@@ -7,7 +7,7 @@ import { useUIStore } from '@/store/uiStore'
 import { formatPrice } from '@/lib/utils'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ShoppingBag, ArrowLeft, Loader2 } from 'lucide-react'
+import { ShoppingBag, ArrowLeft, Loader2, CreditCard, Truck, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export default function CheckoutPage() {
@@ -26,6 +26,7 @@ export default function CheckoutPage() {
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [paymentMethod, setPaymentMethod] = useState<'card' | 'cod'>('card')
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -39,10 +40,24 @@ export default function CheckoutPage() {
         try {
             const cartItems = items.map((item) => ({
                 productSku: item.product.sku,
-                materialSlug: item.selectedMaterial.id, // data.ts uses slug as id (e.g. 'rose-gold')
+                materialSlug: item.selectedMaterial.id,
                 quantity: item.quantity,
             }))
 
+            if (paymentMethod === 'cod') {
+                const res = await fetch('/api/orders/cod', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: cartItems, customerInfo: formData }),
+                })
+                const data = await res.json()
+                if (!res.ok) throw new Error(data.error || 'Failed to place order')
+                clearCart()
+                router.push(`/checkout/success?session_id=${data.sessionId}`)
+                return
+            }
+
+            // Card — Stripe flow
             const res = await fetch('/api/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -53,7 +68,6 @@ export default function CheckoutPage() {
 
             if (!res.ok) throw new Error(data.error || 'Checkout failed')
 
-            // Redirect to Stripe
             if (data.url) {
                 clearCart()
                 window.location.href = data.url
@@ -97,6 +111,40 @@ export default function CheckoutPage() {
                         <div>
                             <h2 className="font-display text-2xl text-luxury-white mb-8">Shipping Information</h2>
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Payment Method */}
+                                <div>
+                                    <h3 className="text-luxury-gold text-xs uppercase tracking-wider mb-4">Payment Method</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {[
+                                            { id: 'card' as const, label: 'Pay by Card', sub: 'Secure online payment via Stripe', icon: CreditCard },
+                                            { id: 'cod' as const, label: 'Cash on Delivery', sub: 'Pay when your order arrives', icon: Truck },
+                                        ].map(({ id, label, sub, icon: Icon }) => (
+                                            <button
+                                                key={id}
+                                                type="button"
+                                                onClick={() => setPaymentMethod(id)}
+                                                className={`relative flex flex-col items-start gap-2 p-4 rounded-lg border transition-all text-left ${
+                                                    paymentMethod === id
+                                                        ? 'border-luxury-gold bg-luxury-gold/10'
+                                                        : 'border-luxury-charcoal-light hover:border-luxury-gold/40'
+                                                }`}
+                                            >
+                                                {paymentMethod === id && (
+                                                    <CheckCircle2 size={14} className="absolute top-3 right-3 text-luxury-gold" />
+                                                )}
+                                                <Icon size={22} className={paymentMethod === id ? 'text-luxury-gold' : 'text-luxury-white/50'} />
+                                                <div>
+                                                    <p className={`text-sm font-medium ${paymentMethod === id ? 'text-luxury-white' : 'text-luxury-white/70'}`}>{label}</p>
+                                                    <p className="text-luxury-white/40 text-xs mt-0.5">{sub}</p>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-luxury-charcoal-light pt-6">
+                                    <h3 className="text-luxury-gold text-xs uppercase tracking-wider mb-4">Shipping Details</h3>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-2">Full Name *</label>
@@ -154,14 +202,18 @@ export default function CheckoutPage() {
                                     <span className="flex items-center justify-center gap-2">
                                         {loading ? (
                                             <><Loader2 size={18} className="animate-spin" /> Processing...</>
+                                        ) : paymentMethod === 'cod' ? (
+                                            <><Truck size={18} /> Place Order — Cash on Delivery</>
                                         ) : (
-                                            <>Pay Securely with Stripe</>
+                                            <><CreditCard size={18} /> Pay Securely with Stripe</>
                                         )}
                                     </span>
                                 </button>
 
                                 <p className="text-luxury-white/40 text-xs text-center">
-                                    🔒 Secured by Stripe. Your payment info is never stored on our servers.
+                                    {paymentMethod === 'cod'
+                                        ? '🚚 Your order will be confirmed and dispatched within 1–3 business days.'
+                                        : '🔒 Secured by Stripe. Your payment info is never stored on our servers.'}
                                 </p>
                             </form>
                         </div>
