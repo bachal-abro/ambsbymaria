@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, Suspense } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import { Filter, X } from 'lucide-react'
 import { products } from '@/lib/data'
 import { formatPrice } from '@/lib/utils'
@@ -13,8 +14,21 @@ import FeaturesBanner from '@/components/home/FeaturesBanner'
 const categories = ['all', 'rings', 'necklaces', 'bracelets', 'earrings'] as const
 type Category = typeof categories[number]
 
-export default function ShopPage() {
-  const [selectedCategory, setSelectedCategory] = useState<Category>('all')
+function ShopContent() {
+  const searchParams = useSearchParams()
+  const urlCategory = searchParams.get('category') as Category
+  
+  const [selectedCategory, setSelectedCategory] = useState<Category>(
+    urlCategory && categories.includes(urlCategory) ? urlCategory : 'all'
+  )
+
+  useEffect(() => {
+    if (urlCategory && categories.includes(urlCategory)) {
+      setSelectedCategory(urlCategory)
+    } else {
+      setSelectedCategory('all')
+    }
+  }, [urlCategory])
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 25000])
   const [showFilters, setShowFilters] = useState(false)
 
@@ -153,6 +167,14 @@ export default function ShopPage() {
       </div>
       <FeaturesBanner />
     </>
+  )
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-luxury-black pt-32 pb-20" />}>
+      <ShopContent />
+    </Suspense>
   )
 }
 
