@@ -34,12 +34,22 @@ interface Message {
 interface Product {
     id: string; name: string; slug: string; sku: string
     description: string; price: number; category: string
-    defaultMaterial: string; inStock: boolean; featured: boolean
+    inStock: boolean; featured: boolean
     images: string[]; specifications: Record<string, string>
     createdAt: string
 }
 
-type Tab = 'orders' | 'messages' | 'products'
+interface PromoCode {
+    id: string
+    code: string
+    discount: number
+    discountType: string
+    active: boolean
+    expiresAt: string | null
+    createdAt: string
+}
+
+type Tab = 'orders' | 'messages' | 'products' | 'promos'
 
 const STATUS_COLORS: Record<string, string> = {
     pending: 'text-yellow-400 border-yellow-400/30 bg-yellow-400/10',
@@ -54,9 +64,17 @@ const CATEGORIES_KEY = 'admin_categories'
 
 const EMPTY_PRODUCT = {
     name: '', slug: '', sku: '', description: '', price: 0,
-    category: 'rings', defaultMaterial: 'rose-gold',
+    category: 'rings',
     inStock: true, featured: false,
     images: [''], specifications: {},
+}
+
+const EMPTY_PROMO = {
+    code: '',
+    discount: 0,
+    discountType: 'flat',
+    active: true,
+    expiresAt: '',
 }
 
 // ─── Admin Page ───────────────────────────────────────────────────────────────
@@ -82,9 +100,16 @@ export default function AdminPage() {
     const [productLoading, setProductLoading] = useState(false)
     const [productError, setProductError] = useState<string | null>(null)
     const [uploadingIdx, setUploadingIdx] = useState<number | null>(null)
-    const [urlModeIdx, setUrlModeIdx] = useState<Set<number>>(new Set())
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+
+    // Promo code state
+    const [promoCodes, setPromoCodes] = useState<PromoCode[]>([])
+    const [showPromoForm, setShowPromoForm] = useState(false)
+    const [editingPromo, setEditingPromo] = useState<PromoCode | null>(null)
+    const [promoForm, setPromoForm] = useState<typeof EMPTY_PROMO>(EMPTY_PROMO)
+    const [promoLoading, setPromoLoading] = useState(false)
+    const [promoError, setPromoError] = useState<string | null>(null)
 
 
     // Category management state
@@ -125,14 +150,16 @@ export default function AdminPage() {
 
     const loadAll = async (pwd: string) => {
         setLoading(true)
-        const [ordersRes, messagesRes, productsRes] = await Promise.all([
+        const [ordersRes, messagesRes, productsRes, promosRes] = await Promise.all([
             fetch('/api/admin/orders', { headers: authHeader(pwd) }),
             fetch('/api/admin/messages', { headers: authHeader(pwd) }),
             fetch('/api/admin/products', { headers: authHeader(pwd) }),
+            fetch('/api/admin/promo-codes', { headers: authHeader(pwd) }),
         ])
         setOrders(await ordersRes.json())
         setMessages(await messagesRes.json())
         setProducts(await productsRes.json())
+        setPromoCodes(await promosRes.json())
         setLoading(false)
     }
 
@@ -184,17 +211,15 @@ export default function AdminPage() {
         setEditingProduct(null)
         setProductForm({ ...EMPTY_PRODUCT, category: categories[0] ?? 'rings' })
         setProductError(null)
-        setUrlModeIdx(new Set())
         setShowProductForm(true)
     }
 
     const openEditProduct = (p: Product) => {
         setEditingProduct(p)
         setProductError(null)
-        setUrlModeIdx(new Set())
         setProductForm({
             name: p.name, slug: p.slug, sku: p.sku, description: p.description,
-            price: p.price, category: p.category, defaultMaterial: p.defaultMaterial,
+            price: p.price, category: p.category,
             inStock: p.inStock, featured: p.featured,
             images: p.images.length ? p.images : [''],
             specifications: p.specifications,
@@ -224,20 +249,6 @@ export default function AdminPage() {
     const addImageField = () => setProductForm((p) => ({ ...p, images: [...p.images, ''] }))
     const removeImageField = (idx: number) => {
         setProductForm((p) => ({ ...p, images: p.images.filter((_, i) => i !== idx) }))
-        setUrlModeIdx((prev) => {
-            const next = new Set(prev)
-            next.delete(idx)
-            return next
-        })
-    }
-
-    const toggleUrlMode = (idx: number) => {
-        setUrlModeIdx((prev) => {
-            const next = new Set(prev)
-            if (next.has(idx)) next.delete(idx)
-            else next.add(idx)
-            return next
-        })
     }
 
     const uploadImage = async (idx: number, file: File) => {
@@ -288,6 +299,7 @@ export default function AdminPage() {
             price: Number(productForm.price),
             images: productForm.images.filter(Boolean),
             materialSlugs: MATERIAL_SLUGS,
+            defaultMaterial: 'rose-gold', // Hardcoded default
             ...(editingProduct ? { id: editingProduct.id } : {}),
         }
 
@@ -328,6 +340,90 @@ export default function AdminPage() {
             body: JSON.stringify({ id }),
         })
         setProducts((prev) => prev.filter((p) => p.id !== id))
+        setDeleteConfirm(null)
+    }
+
+    // ── Promo Codes CRUD ──────────────────────────────────────────────────────
+    const openNewPromo = () => {
+        setEditingPromo(null)
+        setPromoForm(EMPTY_PROMO)
+        setPromoError(null)
+        setShowPromoForm(true)
+    }
+
+    const openEditPromo = (p: PromoCode) => {
+        setEditingPromo(p)
+        setPromoError(null)
+        setPromoForm({
+            code: p.code,
+            discount: p.discount,
+            discountType: p.discountType,
+            active: p.active,
+            expiresAt: p.expiresAt ? p.expiresAt.split('T')[0] : '',
+        })
+        setShowPromoForm(true)
+    }
+
+    const handlePromoFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target
+        setPromoForm((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked
+                : name === 'discount' ? parseFloat(value) || 0 : value,
+        }))
+    }
+
+    const savePromoCode = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setPromoLoading(true)
+        setPromoError(null)
+
+        const payload = {
+            ...promoForm,
+            ...(editingPromo ? { id: editingPromo.id } : {}),
+        }
+
+        try {
+            const res = await fetch('/api/admin/promo-codes', {
+                method: editingPromo ? 'PATCH' : 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeader(adminPwd) },
+                body: JSON.stringify(payload),
+            })
+
+            if (res.ok) {
+                const saved: PromoCode = await res.json()
+                if (editingPromo) {
+                    setPromoCodes((prev) => prev.map((p) => (p.id === saved.id ? saved : p)))
+                } else {
+                    setPromoCodes((prev) => [saved, ...prev])
+                }
+                setShowPromoForm(false)
+            } else {
+                const errData = await res.json().catch(() => null)
+                setPromoError(errData?.error || 'Failed to save promo code')
+            }
+        } catch (err) {
+            setPromoError('Network error')
+        } finally {
+            setPromoLoading(false)
+        }
+    }
+
+    const togglePromoActive = async (id: string, active: boolean) => {
+        await fetch('/api/admin/promo-codes', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', ...authHeader(adminPwd) },
+            body: JSON.stringify({ id, active }),
+        })
+        setPromoCodes((prev) => prev.map((p) => (p.id === id ? { ...p, active } : p)))
+    }
+
+    const deletePromoCode = async (id: string) => {
+        await fetch(`/api/admin/promo-codes?id=${id}`, {
+            method: 'DELETE',
+            headers: { ...authHeader(adminPwd) },
+        })
+        setPromoCodes((prev) => prev.filter((p) => p.id !== id))
         setDeleteConfirm(null)
     }
 
@@ -373,7 +469,7 @@ export default function AdminPage() {
                     {[
                         { label: 'Products', value: products.length, icon: Package },
                         { label: 'Orders', value: orders.length, icon: ShoppingBag },
-                        { label: 'Revenue', value: formatPrice(orders.reduce((s, o) => s + o.total, 0)), icon: CheckCircle },
+                        { label: 'Promo Codes', value: promoCodes.length, icon: Link },
                         { label: 'Unread', value: unread, icon: Eye },
                     ].map(({ label, value, icon: Icon }) => (
                         <div key={label} className="luxury-card p-5">
@@ -385,9 +481,10 @@ export default function AdminPage() {
                 </div>
 
                 {/* Tabs */}
-                <div className="flex gap-4 mb-8 border-b border-luxury-charcoal-light">
+                <div className="flex gap-4 mb-8 border-b border-luxury-charcoal-light overflow-x-auto whitespace-nowrap scrollbar-hide">
                     {([
                         { key: 'products' as Tab, label: `Products (${products.length})`, badge: 0 },
+                        { key: 'promos' as Tab, label: `Promo Codes (${promoCodes.length})`, badge: 0 },
                         { key: 'orders' as Tab, label: `Orders (${orders.length})`, badge: 0 },
                         { key: 'messages' as Tab, label: `Messages (${messages.length})`, badge: unread },
                     ]).map(({ key, label, badge }) => (
@@ -569,7 +666,7 @@ export default function AdminPage() {
                                                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-4 border-t border-luxury-charcoal-light pt-4 space-y-2">
                                                     {order.items.map((item) => (
                                                         <div key={item.id} className="flex justify-between text-sm">
-                                                            <span className="text-luxury-white/70">{item.product.name} – {item.material.name} × {item.quantity}</span>
+                                                            <span className="text-luxury-white/70">{item.product.name} × {item.quantity}</span>
                                                             <span className="text-luxury-gold">{formatPrice(item.unitPrice * item.quantity)}</span>
                                                         </div>
                                                     ))}
@@ -624,13 +721,13 @@ export default function AdminPage() {
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 overflow-y-auto"
                         style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
-                        onClick={(e) => { if (e.target === e.currentTarget) { setShowProductForm(false); setUrlModeIdx(new Set()) } }}
+                        onClick={(e) => { if (e.target === e.currentTarget) { setShowProductForm(false) } }}
                     >
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
                             className="luxury-card w-full max-w-2xl p-8 relative"
                         >
-                            <button onClick={() => { setShowProductForm(false); setUrlModeIdx(new Set()) }} className="absolute top-4 right-4 text-luxury-white/40 hover:text-luxury-white transition-colors">
+                            <button onClick={() => { setShowProductForm(false) }} className="absolute top-4 right-4 text-luxury-white/40 hover:text-luxury-white transition-colors">
                                 <X size={20} />
                             </button>
 
@@ -665,18 +762,10 @@ export default function AdminPage() {
                                     </div>
                                 </div>
 
-                                {/* Price + Default Material */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Price (PKR) *</label>
-                                        <input type="number" name="price" value={productForm.price} onChange={handleProductFormChange} required min={0} step={0.01} className="luxury-input" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Default Material</label>
-                                        <select name="defaultMaterial" value={productForm.defaultMaterial} onChange={handleProductFormChange} className="luxury-input">
-                                            {MATERIAL_SLUGS.map((m) => <option key={m} value={m}>{m}</option>)}
-                                        </select>
-                                    </div>
+                                {/* Price */}
+                                <div>
+                                    <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Price (PKR) *</label>
+                                    <input type="number" name="price" value={productForm.price} onChange={handleProductFormChange} required min={0} step={0.01} className="luxury-input" />
                                 </div>
 
                                 {/* Description */}
@@ -713,7 +802,7 @@ export default function AdminPage() {
                                                     onDragOver={(e) => e.preventDefault()}
                                                     onDrop={(e) => handleFileDrop(idx, e)}
                                                 >
-                                                    {url ? (
+                                                    {url && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('/')) && url.length > 5 ? (
                                                         <>
                                                             <Image
                                                                 src={url}
@@ -735,14 +824,6 @@ export default function AdminPage() {
                                                                     title="Replace image"
                                                                 >
                                                                     <Upload size={16} />
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => toggleUrlMode(idx)}
-                                                                    className="p-2 bg-black/60 rounded-full text-white hover:text-luxury-gold transition-colors"
-                                                                    title="Enter URL manually"
-                                                                >
-                                                                    <Link size={16} />
                                                                 </button>
                                                                 {productForm.images.length > 1 && (
                                                                     <button
@@ -780,23 +861,6 @@ export default function AdminPage() {
                                                     )}
                                                 </div>
 
-                                                {/* URL input row (shown when empty or url-mode toggled) */}
-                                                {(!url || urlModeIdx.has(idx)) && (
-                                                    <div className="flex gap-2 p-2 border-t border-luxury-charcoal-light bg-luxury-charcoal/50">
-                                                        <input
-                                                            value={url}
-                                                            onChange={(e) => handleImageChange(idx, e.target.value)}
-                                                            className="luxury-input flex-1 text-xs py-1"
-                                                            placeholder="Or paste image URL…"
-                                                        />
-                                                        {url && (
-                                                            <button type="button" onClick={() => toggleUrlMode(idx)} className="p-1 text-luxury-white/40 hover:text-luxury-white transition-colors"><X size={12} /></button>
-                                                        )}
-                                                        {productForm.images.length > 1 && !url && (
-                                                            <button type="button" onClick={() => removeImageField(idx)} className="p-1 text-red-400 hover:text-red-300 transition-colors"><Trash2 size={12} /></button>
-                                                        )}
-                                                    </div>
-                                                )}
                                             </div>
                                         ))}
 
@@ -827,11 +891,83 @@ export default function AdminPage() {
 
                                 {/* Submit */}
                                 <div className="flex gap-3 pt-2">
-                                    <button type="button" onClick={() => { setShowProductForm(false); setUrlModeIdx(new Set()) }} className="luxury-btn flex-1"><span>Cancel</span></button>
+                                    <button type="button" onClick={() => { setShowProductForm(false) }} className="luxury-btn flex-1"><span>Cancel</span></button>
                                     <button type="submit" disabled={productLoading} className="luxury-btn-primary flex-1 disabled:opacity-50">
                                         <span className="flex items-center justify-center gap-2">
                                             {productLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                                             {editingProduct ? 'Save Changes' : 'Create Product'}
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* ── PROMO FORM MODAL ── */}
+            <AnimatePresence>
+                {showPromoForm && (
+                    <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                        style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
+                        onClick={(e) => { if (e.target === e.currentTarget) { setShowPromoForm(false) } }}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                            className="luxury-card w-full max-w-md p-8 relative"
+                        >
+                            <button onClick={() => { setShowPromoForm(false) }} className="absolute top-4 right-4 text-luxury-white/40 hover:text-luxury-white transition-colors">
+                                <X size={20} />
+                            </button>
+
+                            <h2 className="font-display text-2xl text-luxury-white mb-6">
+                                {editingPromo ? 'Edit Promo Code' : 'Add New Promo Code'}
+                            </h2>
+
+                            <form onSubmit={savePromoCode} className="space-y-5">
+                                <div>
+                                    <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Code *</label>
+                                    <input name="code" value={promoForm.code} onChange={handlePromoFormChange} required className="luxury-input" placeholder="e.g. WELCOME10" />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Discount Type</label>
+                                        <select name="discountType" value={promoForm.discountType} onChange={handlePromoFormChange} className="luxury-input">
+                                            <option value="flat">Flat Amount</option>
+                                            <option value="percentage">Percentage %</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Discount Value *</label>
+                                        <input type="number" name="discount" value={promoForm.discount} onChange={handlePromoFormChange} required min={0} step={0.01} className="luxury-input" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-luxury-gold text-xs uppercase tracking-wider mb-1">Expires At (Optional)</label>
+                                    <input type="date" name="expiresAt" value={promoForm.expiresAt} onChange={handlePromoFormChange} className="luxury-input" />
+                                </div>
+
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="active" checked={promoForm.active} onChange={handlePromoFormChange} className="w-4 h-4 accent-[#D4AF37]" />
+                                    <span className="text-luxury-white/70 text-sm">Active Now</span>
+                                </label>
+
+                                {promoError && (
+                                    <div className="p-3 rounded border border-red-500/40 bg-red-900/20 text-red-400 text-sm">
+                                        {promoError}
+                                    </div>
+                                )}
+
+                                <div className="flex gap-3 pt-2">
+                                    <button type="button" onClick={() => { setShowPromoForm(false) }} className="luxury-btn flex-1"><span>Cancel</span></button>
+                                    <button type="submit" disabled={promoLoading} className="luxury-btn-primary flex-1 disabled:opacity-50">
+                                        <span className="flex items-center justify-center gap-2">
+                                            {promoLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                                            {editingPromo ? 'Save' : 'Create'}
                                         </span>
                                     </button>
                                 </div>

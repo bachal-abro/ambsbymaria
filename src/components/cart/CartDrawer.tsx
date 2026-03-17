@@ -93,12 +93,9 @@ export default function CartDrawer() {
                         <h3 className="text-luxury-white font-medium mb-1 truncate">
                           {item.product.name}
                         </h3>
-                        <p className="text-luxury-gold/60 text-sm mb-2">
-                          {item.selectedMaterial.name}
-                        </p>
                         <p className="text-luxury-gold font-medium">
                           {formatPrice(
-                            (item.product.price + item.selectedMaterial.price) *
+                            item.product.price *
                               item.quantity
                           )}
                         </p>

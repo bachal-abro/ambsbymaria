@@ -3,28 +3,28 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import Image from 'next/image'
-import { Award, Users, Globe, Heart } from 'lucide-react'
+import { Gem, Tag, Feather, Sparkles } from 'lucide-react'
 
 const values = [
   {
-    icon: Award,
-    title: 'Excellence',
-    description: 'Uncompromising quality in every piece we create',
+    icon: Gem,
+    title: 'Quality',
+    description: 'High-quality materials designed for a beautiful finish and long-lasting shine',
   },
   {
-    icon: Users,
-    title: 'Craftsmanship',
-    description: 'Master artisans with generations of expertise',
+    icon: Tag,
+    title: 'Affordability',
+    description: 'Premium jewelry designs at accessible price points',
   },
   {
-    icon: Globe,
-    title: 'Sustainability',
-    description: 'Ethically sourced materials and responsible practices',
+    icon: Feather,
+    title: 'Comfort',
+    description: 'Lightweight and skin-friendly designs perfect for all-day wear',
   },
   {
-    icon: Heart,
-    title: 'Passion',
-    description: 'Love for the art drives everything we do',
+    icon: Sparkles,
+    title: 'Trendy',
+    description: 'Modern, on-trend pieces that elevate your everyday style effortlessly',
   },
 ]
 
@@ -74,8 +74,7 @@ export default function AboutPage() {
             transition={{ duration: 1, delay: 0.5 }}
             className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto"
           >
-            A legacy of passion, precision, and timeless beauty spanning nearly
-            a century
+            Trendy Jewelry, Designed for Everyday Style
           </motion.p>
         </motion.div>
       </section>
@@ -92,25 +91,14 @@ export default function AboutPage() {
               className="text-center mb-16"
             >
               <h2 className="font-display text-display-md text-luxury-white mb-8">
-                Since 1925
+                Since 2021
               </h2>
               <div className="space-y-6 text-luxury-white/70 text-lg leading-relaxed">
                 <p>
-                  Our journey began in a small atelier in Paris, where a master
-                  craftsman with a vision for extraordinary jewelry laid the
-                  foundation for what would become a legendary house.
+                  Since 2021, AMBS by Maria has been on a mission: to create beautiful, modern jewelry that women can wear every day. We combine on-trend designs, comfortable wear, and thoughtful craftsmanship to make pieces that elevate your style effortlessly.
                 </p>
                 <p>
-                  Through world wars, cultural revolutions, and the evolution
-                  of fashion, we have remained steadfast in our commitment to
-                  creating pieces that transcend time. Each generation has
-                  added its unique touch while honoring the traditional
-                  techniques passed down through decades.
-                </p>
-                <p>
-                  Today, we combine these time-honored methods with cutting-edge
-                  technology, ensuring that every piece meets the exacting
-                  standards that have defined us for nearly a century.
+                  From delicate earrings to statement jhumkas, every piece is crafted with care to bring elegance and joy to your everyday life. Our jewelry isn’t just an accessory — it’s a way to express yourself with style, confidence, and comfort.
                 </p>
               </div>
             </motion.div>
@@ -191,57 +179,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Craftsmanship Detail */}
-      <section id="craftsmanship" className="py-32 bg-luxury-charcoal">
-        <div className="luxury-container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h2 className="font-display text-display-md text-luxury-white mb-8">
-                The Art of <span className="text-gradient">Craftsmanship</span>
-              </h2>
-              <div className="space-y-6 text-luxury-white/70 text-lg leading-relaxed">
-                <p>
-                  Our master craftsmen undergo years of rigorous training,
-                  learning techniques that have been refined over generations.
-                  Each piece passes through multiple pairs of expert hands
-                  before it reaches you.
-                </p>
-                <p>
-                  From the initial sketch to the final polish, every step is
-                  performed with meticulous attention to detail. We use only
-                  the finest materials: ethically sourced diamonds, conflict-free
-                  gemstones, and precious metals of the highest purity.
-                </p>
-                <p>
-                  This dedication to excellence means that each piece is not
-                  just jewelry—it's a work of art, an heirloom, a story waiting
-                  to be told.
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative aspect-[4/5] luxury-card overflow-hidden"
-            >
-              <Image
-                src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800"
-                alt="Craftsman at work"
-                fill
-                className="object-cover"
-              />
-            </motion.div>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

@@ -19,6 +19,13 @@ interface CODBody {
         postalCode: string
         country: string
     }
+    paymentMethod: 'cod' | 'advance'
+    subtotal: number
+    shippingCost: number
+    taxAmount: number
+    promoCode?: string
+    discountApplied?: number
+    total: number
 }
 
 export async function POST(request: Request) {
@@ -44,7 +51,7 @@ export async function POST(request: Request) {
                 )
             }
 
-            const unitPrice = product.price + material.price
+            const unitPrice = product.price
             total += unitPrice * item.quantity
             orderItemsData.push({
                 productId: product.id,
@@ -54,12 +61,13 @@ export async function POST(request: Request) {
             })
         }
 
-        // Generate a unique COD session reference
-        const codRef = `COD-${randomBytes(12).toString('hex')}`
+        // Generate a unique reference
+        const refPrefix = body.paymentMethod === 'cod' ? 'COD' : 'ADV'
+        const orderRef = `${refPrefix}-${randomBytes(8).toString('hex').toUpperCase()}`
 
         const order = await prisma.order.create({
             data: {
-                stripeSessionId: codRef,
+                stripeSessionId: orderRef,
                 customerName: customerInfo.name,
                 email: customerInfo.email,
                 phone: customerInfo.phone,
@@ -68,7 +76,9 @@ export async function POST(request: Request) {
                 postalCode: customerInfo.postalCode,
                 country: customerInfo.country,
                 status: 'pending',
-                total,
+                total: body.total,
+                promoCode: body.promoCode || "",
+                discountApplied: body.discountApplied || 0,
                 items: { create: orderItemsData },
             },
             include: {
@@ -76,7 +86,7 @@ export async function POST(request: Request) {
             },
         })
 
-        return NextResponse.json({ sessionId: codRef, orderId: order.id })
+        return NextResponse.json({ sessionId: orderRef, orderId: order.id })
     } catch (error) {
         console.error('COD order error:', error)
         return NextResponse.json({ error: 'Failed to place order' }, { status: 500 })

@@ -44,7 +44,7 @@ export default function BrandStory() {
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.2 }}
             >
-              Our Heritage
+              Our Story
             </motion.p>
 
             <motion.h2
@@ -53,8 +53,8 @@ export default function BrandStory() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.3, duration: 0.8 }}
             >
-              A Legacy of{' '}
-              <span className="text-gradient">Excellence</span>
+              Everyday <br />
+              <span className="text-gradient">Elegance</span>
             </motion.h2>
 
             <motion.div
@@ -64,45 +64,17 @@ export default function BrandStory() {
               transition={{ delay: 0.5, duration: 0.8 }}
             >
               <p>
-                Since 1925, we have dedicated ourselves to the art of fine
-                jewelry, creating pieces that transcend time and trends. Each
-                creation is a testament to our unwavering commitment to
-                perfection.
+                Since 2021, AMBS by Maria has been on a mission: to create beautiful,
+                modern jewelry that women can wear every day. We combine on-trend designs,
+                comfortable wear, and thoughtful craftsmanship to make pieces that elevate your style effortlessly.
               </p>
               <p>
-                Our master craftsmen bring generations of expertise to every
-                piece, combining traditional techniques with modern innovation.
-                The result is jewelry that doesn't just adorn—it tells a story.
-              </p>
-              <p>
-                From the selection of the finest materials to the final polish,
-                every step is executed with meticulous attention to detail,
-                ensuring that each piece meets our exacting standards of
-                excellence.
+                From delicate earrings to statement jhumkas, every piece is crafted with care to
+                bring elegance and joy to your everyday life. Our jewelry isn’t just an accessory
+                — it’s a way to express yourself with style, confidence, and comfort.
               </p>
             </motion.div>
 
-            <motion.div
-              className="mt-12 grid grid-cols-3 gap-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.7, duration: 0.8 }}
-            >
-              {[
-                { number: '98+', label: 'Years of Excellence' },
-                { number: '50K+', label: 'Happy Clients' },
-                { number: '100%', label: 'Handcrafted' },
-              ].map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-4xl font-display text-luxury-gold mb-2">
-                    {stat.number}
-                  </div>
-                  <div className="text-luxury-white/60 text-sm">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </motion.div>
           </motion.div>
 
           {/* Image */}
@@ -114,13 +86,12 @@ export default function BrandStory() {
           >
             <div className="relative aspect-[4/5] overflow-hidden luxury-card">
               <Image
-                src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800"
-                alt="Craftsmanship"
+                src="/images/about/thank-you.jpg"
+                alt="AMBS by Maria Personal Note"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              {/* Glow overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </div>
 

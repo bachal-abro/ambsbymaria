@@ -15,11 +15,11 @@ export async function GET(request: Request) {
     })
 
     return NextResponse.json(
-        products.map((p) => ({
+        products.map((p: any) => ({
             ...p,
             images: JSON.parse(p.images),
             specifications: JSON.parse(p.specifications),
-            materials: p.materials.map((pm) => pm.material),
+            materials: p.materials.map((pm: any) => pm.material),
         }))
     )
 }
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         if (materialSlugs?.length) {
             const materials = await prisma.material.findMany({ where: { slug: { in: materialSlugs } } })
             await prisma.productMaterial.createMany({
-                data: materials.map((m) => ({ productId: product.id, materialId: m.id })),
+                data: materials.map((m: any) => ({ productId: product.id, materialId: m.id })),
                 skipDuplicates: true,
             })
         }
@@ -77,7 +77,7 @@ export async function PATCH(request: Request) {
             await prisma.productMaterial.deleteMany({ where: { productId: id } })
             const materials = await prisma.material.findMany({ where: { slug: { in: materialSlugs } } })
             await prisma.productMaterial.createMany({
-                data: materials.map((m) => ({ productId: id, materialId: m.id })),
+                data: materials.map((m: any) => ({ productId: id, materialId: m.id })),
                 skipDuplicates: true,
             })
         }

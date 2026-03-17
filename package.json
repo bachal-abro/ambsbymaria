@@ -16,7 +16,8 @@
     "prisma:seed": "npx tsx prisma/seed.ts",
     "prisma:push": "npx prisma db push",
     "prisma:studio": "npx prisma studio",
-    "prisma:generate": "npx prisma generate"
+    "prisma:generate": "npx prisma generate",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
@@ -42,6 +43,7 @@
     "react-dom": "^18.2.0",
     "react-intersection-observer": "^9.8.1",
     "stripe": "^14.14.0",
+    "swiper": "^12.1.2",
     "tailwind-merge": "^2.2.1",
     "three": "^0.161.0",
     "zustand": "^4.5.0"

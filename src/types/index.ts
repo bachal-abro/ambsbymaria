@@ -7,7 +7,6 @@ export interface Product {
   price: number
   category: 'rings' | 'necklaces' | 'bracelets' | 'earrings'
   materials: Material[]
-  defaultMaterial: string
   images: string[]
   model3D?: string
   inStock: boolean

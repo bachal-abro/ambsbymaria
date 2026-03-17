@@ -79,7 +79,7 @@ export default function Hero() {
       ref={containerRef}
       className="relative h-screen w-full overflow-hidden"
       style={{
-        background: 'linear-gradient(to bottom, #E896B8 0%, #F0B0C8 25%, #F8C8D8 55%, #FDDDE6 75%, #F8C8D8 100%)',
+        background: 'linear-gradient(to bottom, #fae6e8 0%, #f8d0d3 40%, #eebabc 75%, #f8d0d3 100%)',
       }}
     >
 
@@ -132,10 +132,10 @@ export default function Hero() {
             letterSpacing: '0.03em',
             lineHeight: 1.15,
             fontWeight: 400,
-            textShadow: '0 2px 24px rgba(60,15,30,0.55), 0 0 60px rgba(255,200,220,0.25)',
+            textShadow: '0 2px 24px rgba(60,15,30,0.55), 0 0 60px rgba(248,208,211,0.3)',
           }}
         >
-          Elegance Crafted By Maria
+          Trendy Jewellery Crafted By Maria
         </h1>
 
         <div className="hero-cta">

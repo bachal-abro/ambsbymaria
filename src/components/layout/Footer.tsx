@@ -4,6 +4,22 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Instagram, Facebook, Twitter } from 'lucide-react'
 
+// Custom TikTok Icon as Lucide doesn't have it in this version
+const TiktokIcon = ({ size = 24 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+)
+
 const footerLinks = {
   collections: [
     { name: 'Rings', href: '/shop?category=rings' },
@@ -18,17 +34,17 @@ const footerLinks = {
     { name: 'Locations', href: '/contact#locations' },
   ],
   support: [
-    { name: 'Shipping & Returns', href: '/support/shipping' },
-    { name: 'Size Guide', href: '/support/size-guide' },
-    { name: 'Care Instructions', href: '/support/care' },
-    { name: 'FAQ', href: '/support/faq' },
+    { name: 'Privacy Policy', href: '/privacy-policy' },
+    { name: 'Return & Refund Policy', href: '/return-policy' },
+    { name: 'Shipping & Service Policy', href: '/shipping-policy' },
+    { name: 'Terms & Conditions', href: '/terms' },
   ],
 }
 
 const socialLinks = [
-  { name: 'Instagram', icon: Instagram, href: 'https://instagram.com' },
-  { name: 'Facebook', icon: Facebook, href: 'https://facebook.com' },
-  { name: 'Twitter', icon: Twitter, href: 'https://twitter.com' },
+  { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/ambsbymaria/' },
+  { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/people/AmbsbyMaria/61578887583824/#' },
+  { name: 'Tiktok', icon: TiktokIcon, href: 'https://www.tiktok.com/@ambsbymaria' },
 ]
 
 export default function Footer() {
@@ -49,8 +65,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-luxury-white/60 mb-6 max-w-sm leading-relaxed">
-              Crafting timeless elegance since 1925. Each piece tells a story of
-              unparalleled craftsmanship and luxury.
+              Experience the beauty of handcrafted jewelry. Timeless designs, effortless elegance, and luxury you can wear every day.
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((social) => {
@@ -153,18 +168,30 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} AmbsbyMaria. All rights
             reserved.
           </p>
-          <div className="flex space-x-6 text-sm">
+          <div className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-2 text-sm">
             <Link
-              href="/privacy"
+              href="/privacy-policy"
               className="text-luxury-white/60 hover:text-luxury-gold transition-colors duration-300"
             >
               Privacy Policy
             </Link>
             <Link
+              href="/return-policy"
+              className="text-luxury-white/60 hover:text-luxury-gold transition-colors duration-300"
+            >
+              Return Policy
+            </Link>
+            <Link
+              href="/shipping-policy"
+              className="text-luxury-white/60 hover:text-luxury-gold transition-colors duration-300"
+            >
+              Shipping Policy
+            </Link>
+            <Link
               href="/terms"
               className="text-luxury-white/60 hover:text-luxury-gold transition-colors duration-300"
             >
-              Terms of Service
+              Terms & Conditions
             </Link>
           </div>
         </div>

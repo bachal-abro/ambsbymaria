@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, Suspense, useMemo } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import {
   OrbitControls,
   Environment,
@@ -153,13 +153,22 @@ function CinematicLighting() {
 
 function Scene() {
   const GPUTier = useDetectGPU()
+  const { viewport } = useThree()
+  const aspect = viewport.aspect
+  
+  // Dynamic scaling and positioning for responsiveness
+  // On mobile (portrait, aspect < 1), we move the camera back and scale down slightly
+  const isPortrait = aspect < 1
+  const cameraZ = isPortrait ? 8.5 : 6.5
+  const baseScale = isPortrait ? aspect * 1.5 : 1
+  const modelScale = Math.min(1.2, Math.max(0.7, baseScale))
 
   const isMobile = GPUTier?.isMobile || false
   const isLowEnd = GPUTier?.tier === 0 || GPUTier?.tier === 1
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 1.5, 6.5]} fov={45} />
+      <PerspectiveCamera makeDefault position={[0, 1.2, cameraZ]} fov={45} />
 
       <CinematicLighting />
 
@@ -171,7 +180,9 @@ function Scene() {
       />
 
       {/* Main 3D Model — Chain Link Necklace */}
-      <ChainLinkNecklace />
+      <group scale={modelScale} position={[0, isPortrait ? 0.3 : 0, 0]}>
+        <ChainLinkNecklace />
+      </group>
 
       {/* Ground shadow */}
       <ContactShadows

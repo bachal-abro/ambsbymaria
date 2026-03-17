@@ -39,17 +39,16 @@ const features = [
                 className="w-14 h-14"
                 aria-hidden="true"
             >
-                {/* Wrench */}
-                <path d="M46 6a12 12 0 0 0-11.7 14.6L10 45a4 4 0 1 0 5.7 5.6l24.4-24.4A12 12 0 0 0 46 6z" />
-                <line x1="10" y1="48" x2="16" y2="54" />
-                {/* Spanner cross */}
-                <path d="M38 10 L54 26" />
-                <path d="M54 10 L38 26" />
+                {/* Diamond/Gem Icon */}
+                <path d="M12 24 L32 8 L52 24 L32 56 Z" />
+                <path d="M12 24 L52 24" />
+                <path d="M22 24 L32 8 L42 24" />
+                <path d="M22 24 L32 56 L42 24" />
             </svg>
         ),
-        title: 'AFTER SALES SERVICE',
+        title: 'QUALITY YOU CAN TRUST',
         description:
-            'To help you enjoy extended use of your articles, for a nominal charge, you can avail replating and stone replacement service at our branches.',
+            'Our jewelry is carefully crafted using high-quality materials to ensure a beautiful finish and long-lasting shine.',
     },
     {
         icon: (
@@ -77,7 +76,7 @@ const features = [
         ),
         title: 'FREE SHIPPING',
         description:
-            'We offer free delivery to your doorstep across Pakistan via TCS. No hidden charges!',
+            'We offer free delivery above order value of Rs 2500/- via M&P. Our Official Logistic Partner! ',
     },
 ]
 

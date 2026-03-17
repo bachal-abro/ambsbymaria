@@ -39,7 +39,7 @@ export const useCartStore = create<CartStore>()(
           const total = newItems.reduce(
             (sum, item) =>
               sum +
-              (item.product.price + item.selectedMaterial.price) *
+              item.product.price *
                 item.quantity,
             0
           )
@@ -61,7 +61,7 @@ export const useCartStore = create<CartStore>()(
           const total = newItems.reduce(
             (sum, item) =>
               sum +
-              (item.product.price + item.selectedMaterial.price) *
+              item.product.price *
                 item.quantity,
             0
           )
@@ -82,7 +82,7 @@ export const useCartStore = create<CartStore>()(
           const total = newItems.reduce(
             (sum, item) =>
               sum +
-              (item.product.price + item.selectedMaterial.price) *
+              item.product.price *
                 item.quantity,
             0
           )

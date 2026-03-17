@@ -102,7 +102,7 @@ function SuccessContent() {
                                     <div key={item.id} className="flex justify-between items-center">
                                         <div>
                                             <p className="text-luxury-white text-sm">{item.product.name}</p>
-                                            <p className="text-luxury-white/50 text-xs">{item.material.name} × {item.quantity}</p>
+                                            <p className="text-luxury-white/50 text-xs">Quantity: {item.quantity}</p>
                                         </div>
                                         <p className="text-luxury-gold text-sm">{formatPrice(item.unitPrice * item.quantity)}</p>
                                     </div>

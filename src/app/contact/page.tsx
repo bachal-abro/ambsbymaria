@@ -6,22 +6,10 @@ import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 
 const locations = [
   {
-    city: 'Paris',
-    address: '12 Place Vendôme, 75001 Paris, France',
-    phone: '+33 1 42 86 82 00',
+    city: 'Islamabad',
+    address: 'F8 Islamabad, Pakistan ',
+    phone: '+92-310-0882460',
     hours: 'Mon-Sat: 10:00 - 19:00',
-  },
-  {
-    city: 'New York',
-    address: '725 Fifth Avenue, New York, NY 10022',
-    phone: '+1 212 753 4300',
-    hours: 'Mon-Sat: 10:00 - 18:00',
-  },
-  {
-    city: 'Tokyo',
-    address: '5-7-5 Ginza, Chuo-ku, Tokyo 104-0061',
-    phone: '+81 3 3569 1111',
-    hours: 'Mon-Sun: 11:00 - 20:00',
   },
 ]
 
@@ -151,7 +139,6 @@ export default function ContactPage() {
                   <option value="">Select a subject</option>
                   <option value="inquiry">General Inquiry</option>
                   <option value="custom">Custom Design</option>
-                  <option value="appointment">Book Appointment</option>
                   <option value="support">Customer Support</option>
                 </select>
               </div>
@@ -222,7 +209,7 @@ export default function ContactPage() {
                       href="mailto:info@ambsbymaria.com"
                       className="text-luxury-white hover:text-luxury-gold transition-colors"
                     >
-                      info@ambsbymaria.com
+                      [ambsbymaria@gmail.com]
                     </a>
                   </div>
                 </div>
@@ -233,13 +220,13 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-luxury-gold text-sm uppercase tracking-wider mb-1">
-                      Phone
+                      Contact Number
                     </p>
                     <a
                       href="tel:+18005551234"
                       className="text-luxury-white hover:text-luxury-gold transition-colors"
                     >
-                      +1 (800) 555-1234
+                      +92-310-0882460
                     </a>
                   </div>
                 </div>
@@ -253,7 +240,7 @@ export default function ContactPage() {
                       Hours
                     </p>
                     <p className="text-luxury-white">
-                      Monday - Saturday: 10:00 - 18:00
+                      Monday - Saturday: 10:00 - 19:00
                     </p>
                     <p className="text-luxury-white">Sunday: Closed</p>
                   </div>
@@ -261,18 +248,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="luxury-card p-8">
-              <h3 className="font-display text-xl text-luxury-gold mb-4">
-                Private Consultations
-              </h3>
-              <p className="text-luxury-white/70 mb-6">
-                Schedule a one-on-one consultation with our jewelry experts to
-                explore our collections or discuss custom designs.
-              </p>
-              <button className="luxury-btn">
-                <span>Book Appointment</span>
-              </button>
-            </div>
+
           </motion.div>
         </div>
 
